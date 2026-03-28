@@ -1,4 +1,4 @@
-##🛒 Sistema de Gerenciamento de Loja
+🛒 Sistema de Gerenciamento de Loja
 📌 Sobre o Projeto
 
 O Sistema de Gerenciamento de Loja é uma aplicação desenvolvida com o objetivo de automatizar e organizar as operações comerciais de uma loja.
