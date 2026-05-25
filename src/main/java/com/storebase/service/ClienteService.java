@@ -1,11 +1,12 @@
 package com.storebase.service;
 
-import com.storebase.model.Cliente;
-import com.storebase.repository.ClienteRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.storebase.model.Cliente;
+import com.storebase.repository.ClienteRepository;
 
 @Service
 public class ClienteService {
