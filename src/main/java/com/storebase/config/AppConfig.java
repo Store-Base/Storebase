@@ -1,28 +1,27 @@
 package com.storebase.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-@Configuration
-public class AppConfig implements WebMvcConfigurer {
+public class AppConfig {
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
-    }
+    private static final String URL = "jdbc:postgresql://localhost:5432/storebase";
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "postgres";
 
-    @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        return mapper;
+    private static Connection connection;
+
+    private AppConfig() {}
+
+    public static Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            }
+            return connection;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao conectar com o banco de dados: " + e.getMessage(), e);
+        }
     }
 }
