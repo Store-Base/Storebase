@@ -11,21 +11,21 @@ public class Venda {
     private Funcionario funcionario;
     private List<ItemVenda> itens;
     private double valorTotal;
-    private double desconto;
-    private String formaPagamento;
+    private String status;
     private LocalDate data;
 
     public Venda() {
         this.itens = new ArrayList<>();
         this.data = LocalDate.now();
+        this.status = "finalizada";
     }
 
-    public Venda(Cliente cliente, Funcionario funcionario, String formaPagamento) {
+    public Venda(Cliente cliente, Funcionario funcionario) {
         this.cliente = cliente;
         this.funcionario = funcionario;
-        this.formaPagamento = formaPagamento;
         this.itens = new ArrayList<>();
         this.data = LocalDate.now();
+        this.status = "finalizada";
     }
 
     public void adicionarItem(ItemVenda item) {
@@ -38,7 +38,7 @@ public class Venda {
         for (ItemVenda item : itens) {
             soma += item.getSubtotal();
         }
-        this.valorTotal = soma - this.desconto;
+        this.valorTotal = soma;
     }
 
     public int getId() { return id; }
@@ -56,18 +56,9 @@ public class Venda {
     public double getValorTotal() { return valorTotal; }
     public void setValorTotal(double valorTotal) { this.valorTotal = valorTotal; }
 
-    public double getDesconto() { return desconto; }
-    public void setDesconto(double desconto) { this.desconto = desconto; }
-
-    public String getFormaPagamento() { return formaPagamento; }
-    public void setFormaPagamento(String formaPagamento) { this.formaPagamento = formaPagamento; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public LocalDate getData() { return data; }
     public void setData(LocalDate data) { this.data = data; }
-
-    @Override
-    public String toString() {
-        return "Venda{id=" + id + ", cliente=" + (cliente != null ? cliente.getNome() : "N/A")
-                + ", total=" + valorTotal + ", data=" + data + "}";
-    }
 }

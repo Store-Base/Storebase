@@ -7,16 +7,14 @@ public class Funcionario {
     private String cargo;
     private String login;
     private String senha;
-    private double salario;
 
     public Funcionario() {}
 
-    public Funcionario(String nome, String cargo, String login, String senha, double salario) {
+    public Funcionario(String nome, String cargo, String login, String senha) {
         this.nome = nome;
         this.cargo = cargo;
         this.login = login;
         this.senha = senha;
-        this.salario = salario;
     }
 
     public int getId() { return id; }
@@ -33,13 +31,4 @@ public class Funcionario {
 
     public String getSenha() { return senha; }
     public void setSenha(String senha) { this.senha = senha; }
-
-    public double getSalario() { return salario; }
-    public void setSalario(double salario) { this.salario = salario; }
-
-    @Override
-    public String toString() {
-        return "Funcionario{id=" + id + ", nome='" + nome + "', cargo='" + cargo
-                + "', login='" + login + "'}";
-    }
 }
