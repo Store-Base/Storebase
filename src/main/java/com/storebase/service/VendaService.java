@@ -23,17 +23,25 @@ public class VendaService {
         if (venda.getItens() == null || venda.getItens().isEmpty()) {
             throw new IllegalArgumentException("A venda deve conter ao menos um item.");
         }
+
+        // Busca os produtos reais no banco antes de validar
         for (ItemVenda item : venda.getItens()) {
-            Produto produto = item.getProduto();
-            if (produto.getQuantidadeEstoque() < item.getQuantidade()) {
+            Produto produtoDoBanco = produtoRepository.buscarPorId(item.getProduto().getId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Produto não encontrado com id: " + item.getProduto().getId()));
+            item.setProduto(produtoDoBanco); // substitui o objeto parcial pelo completo
+
+            if (produtoDoBanco.getQuantidadeEstoque() < item.getQuantidade()) {
                 throw new IllegalArgumentException(
-                        "Estoque insuficiente para o produto: " + produto.getNome()
-                        + ". Disponivel: " + produto.getQuantidadeEstoque()
-                        + ", solicitado: " + item.getQuantidade());
+                        "Estoque insuficiente para o produto: " + produtoDoBanco.getNome()
+                                + ". Disponivel: " + produtoDoBanco.getQuantidadeEstoque()
+                                + ", solicitado: " + item.getQuantidade());
             }
         }
+
         venda.calcularTotal();
         vendaRepository.salvar(venda);
+
         for (ItemVenda item : venda.getItens()) {
             Produto produto = item.getProduto();
             produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - item.getQuantidade());
