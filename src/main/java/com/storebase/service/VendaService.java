@@ -28,7 +28,7 @@ public class VendaService {
             if (produto.getQuantidadeEstoque() < item.getQuantidade()) {
                 throw new IllegalArgumentException(
                         "Estoque insuficiente para o produto: " + produto.getNome()
-                        + ". Disponível: " + produto.getQuantidadeEstoque()
+                        + ". Disponivel: " + produto.getQuantidadeEstoque()
                         + ", solicitado: " + item.getQuantidade());
             }
         }
@@ -43,7 +43,7 @@ public class VendaService {
 
     public Venda buscarPorId(int id) {
         return vendaRepository.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Venda não encontrada com id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Venda nao encontrada com id: " + id));
     }
 
     public List<Venda> listarTodas() {
