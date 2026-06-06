@@ -1,0 +1,11 @@
+# Compilados Java
+*.class
+target/
+
+# Credenciais
+application.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/

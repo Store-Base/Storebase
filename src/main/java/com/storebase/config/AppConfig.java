@@ -8,7 +8,7 @@ public class AppConfig {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/storebase";
     private static final String USER = "postgres";
-    private static final String PASSWORD = "postgres";
+    private static final String PASSWORD = "Marino96351!";
 
     private static Connection connection;
 
