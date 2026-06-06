@@ -1,57 +1,29 @@
 package com.storebase.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Orcamento {
 
     private int id;
-    private Cliente cliente;
-    private List<ItemVenda> itens;
     private double valorTotal;
     private String status;
+    private int clienteId;
+    private int usuarioId;
+    private String nomeComprador;
+    private String cpfCnpj;
 
     public Orcamento() {
-        this.itens = new ArrayList<>();
         this.status = "aberto";
     }
 
-    public Orcamento(Cliente cliente) {
-        this.cliente = cliente;
-        this.itens = new ArrayList<>();
+    public Orcamento(int clienteId, int usuarioId, String nomeComprador, String cpfCnpj) {
+        this.clienteId = clienteId;
+        this.usuarioId = usuarioId;
+        this.nomeComprador = nomeComprador;
+        this.cpfCnpj = cpfCnpj;
         this.status = "aberto";
-    }
-
-    public void adicionarItem(ItemVenda item) {
-        itens.add(item);
-        calcularTotal();
-    }
-
-    public void removerItem(ItemVenda item) {
-        itens.remove(item);
-        calcularTotal();
-    }
-
-    public void calcularTotal() {
-        double soma = 0;
-        for (ItemVenda item : itens) {
-            soma += item.getSubtotal();
-        }
-        this.valorTotal = soma;
-    }
-
-    public void fechar() {
-        this.status = "fechado";
     }
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
-
-    public List<ItemVenda> getItens() { return itens; }
-    public void setItens(List<ItemVenda> itens) { this.itens = itens; }
 
     public double getValorTotal() { return valorTotal; }
     public void setValorTotal(double valorTotal) { this.valorTotal = valorTotal; }
@@ -59,10 +31,15 @@ public class Orcamento {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    @Override
-    public String toString() {
-        return "Orcamento{id=" + id + ", cliente="
-                + (cliente != null ? cliente.getNome() : "N/A")
-                + ", total=" + valorTotal + ", status='" + status + "'}";
-    }
+    public int getClienteId() { return clienteId; }
+    public void setClienteId(int clienteId) { this.clienteId = clienteId; }
+
+    public int getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(int usuarioId) { this.usuarioId = usuarioId; }
+
+    public String getNomeComprador() { return nomeComprador; }
+    public void setNomeComprador(String nomeComprador) { this.nomeComprador = nomeComprador; }
+
+    public String getCpfCnpj() { return cpfCnpj; }
+    public void setCpfCnpj(String cpfCnpj) { this.cpfCnpj = cpfCnpj; }
 }

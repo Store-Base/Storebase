@@ -13,14 +13,13 @@ import java.util.Optional;
 public class FuncionarioRepository {
 
     public void salvar(Funcionario funcionario) {
-        String sql = "INSERT INTO funcionario (nome, cargo, login, senha, salario) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO usuario (nome, cargo, login, senha) VALUES (?, ?, ?, ?)";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, funcionario.getNome());
             stmt.setString(2, funcionario.getCargo());
             stmt.setString(3, funcionario.getLogin());
             stmt.setString(4, funcionario.getSenha());
-            stmt.setDouble(5, funcionario.getSalario());
             stmt.executeUpdate();
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) funcionario.setId(rs.getInt(1));
@@ -31,15 +30,14 @@ public class FuncionarioRepository {
     }
 
     public void atualizar(Funcionario funcionario) {
-        String sql = "UPDATE funcionario SET nome=?, cargo=?, login=?, senha=?, salario=? WHERE id=?";
+        String sql = "UPDATE usuario SET nome=?, cargo=?, login=?, senha=? WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, funcionario.getNome());
             stmt.setString(2, funcionario.getCargo());
             stmt.setString(3, funcionario.getLogin());
             stmt.setString(4, funcionario.getSenha());
-            stmt.setDouble(5, funcionario.getSalario());
-            stmt.setInt(6, funcionario.getId());
+            stmt.setInt(5, funcionario.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar funcionario: " + e.getMessage());
@@ -47,7 +45,7 @@ public class FuncionarioRepository {
     }
 
     public void deletar(int id) {
-        String sql = "DELETE FROM funcionario WHERE id=?";
+        String sql = "DELETE FROM usuario WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -58,7 +56,7 @@ public class FuncionarioRepository {
     }
 
     public Optional<Funcionario> buscarPorId(int id) {
-        String sql = "SELECT * FROM funcionario WHERE id=?";
+        String sql = "SELECT * FROM usuario WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -73,7 +71,7 @@ public class FuncionarioRepository {
 
     public List<Funcionario> listarTodos() {
         List<Funcionario> lista = new ArrayList<>();
-        String sql = "SELECT * FROM funcionario ORDER BY nome";
+        String sql = "SELECT * FROM usuario ORDER BY nome";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -85,7 +83,7 @@ public class FuncionarioRepository {
     }
 
     public Optional<Funcionario> buscarPorLogin(String login) {
-        String sql = "SELECT * FROM funcionario WHERE login=?";
+        String sql = "SELECT * FROM usuario WHERE login=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, login);
@@ -105,7 +103,6 @@ public class FuncionarioRepository {
         f.setCargo(rs.getString("cargo"));
         f.setLogin(rs.getString("login"));
         f.setSenha(rs.getString("senha"));
-        f.setSalario(rs.getDouble("salario"));
         return f;
     }
 }
