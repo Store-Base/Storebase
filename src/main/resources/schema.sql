@@ -57,3 +57,13 @@ CREATE TABLE IF NOT EXISTS orcamento (
     CONSTRAINT fk_orcamento_cliente FOREIGN KEY (cliente_id) REFERENCES cliente(id),
     CONSTRAINT fk_orcamento_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
+
+CREATE TABLE IF NOT EXISTS item_orcamento (
+    orcamento_id INT NOT NULL,
+    produto_id INT NOT NULL,
+    quantidade INT NOT NULL,
+    preco_unitario DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (orcamento_id, produto_id),
+    CONSTRAINT fk_item_orcamento FOREIGN KEY (orcamento_id) REFERENCES orcamento(id) ON DELETE CASCADE,
+    CONSTRAINT fk_item_orcamento_produto FOREIGN KEY (produto_id) REFERENCES produto(id)
+);
