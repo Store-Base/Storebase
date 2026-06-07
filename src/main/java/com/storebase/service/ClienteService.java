@@ -6,13 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.storebase.model.Cliente;
+import com.storebase.model.Venda;
 import com.storebase.repository.ClienteRepository;
+import com.storebase.repository.VendaRepository;
 
 @Service
 public class ClienteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private VendaRepository vendaRepository;
 
     public void cadastrar(Cliente cliente) {
         if (cliente.getCpf() == null || cliente.getCpf().isBlank()) {
@@ -50,5 +55,10 @@ public class ClienteService {
     public Cliente buscarPorCpf(String cpf) {
         return clienteRepository.buscarPorCpf(cpf)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado com CPF: " + cpf));
+    }
+
+    public List<Venda> verHistorico(int clienteId) {
+        buscarPorId(clienteId);
+        return vendaRepository.listarPorCliente(clienteId);
     }
 }

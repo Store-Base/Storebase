@@ -1,6 +1,7 @@
 package com.storebase.controller;
 
 import com.storebase.model.Cliente;
+import com.storebase.model.Venda;
 import com.storebase.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,11 @@ public class ClienteController {
     public ResponseEntity<Void> deletar(@PathVariable int id) {
         clienteService.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/historico")
+    public List<Venda> verHistorico(@PathVariable int id) {
+        return clienteService.verHistorico(id);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

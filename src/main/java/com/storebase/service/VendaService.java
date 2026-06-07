@@ -1,5 +1,6 @@
 package com.storebase.service;
 
+import com.storebase.model.Comprovante;
 import com.storebase.model.ItemVenda;
 import com.storebase.model.Produto;
 import com.storebase.model.Venda;
@@ -60,5 +61,19 @@ public class VendaService {
 
     public List<Venda> listarPorCliente(int clienteId) {
         return vendaRepository.listarPorCliente(clienteId);
+    }
+
+    public Comprovante gerarComprovante(int vendaId) {
+        Venda venda = buscarPorId(vendaId);
+        Comprovante comprovante = new Comprovante();
+        comprovante.setNumeroVenda(venda.getId());
+        comprovante.setData(venda.getData().toString());
+        comprovante.setNomeCliente(venda.getCliente().getNome());
+        comprovante.setNomeFuncionario(venda.getFuncionario().getNome());
+        comprovante.setItens(venda.getItens());
+        comprovante.setDesconto(venda.getDesconto());
+        comprovante.setValorTotal(venda.getValorTotal());
+        comprovante.setFormaPagamento(venda.getFormaPagamento());
+        return comprovante;
     }
 }

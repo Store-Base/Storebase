@@ -1,5 +1,6 @@
 package com.storebase.controller;
 
+import com.storebase.model.Comprovante;
 import com.storebase.model.Venda;
 import com.storebase.service.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,11 @@ public class VendaController {
     public ResponseEntity<Void> registrarVenda(@RequestBody Venda venda) {
         vendaService.registrarVenda(venda);
         return ResponseEntity.status(201).build();
+    }
+
+    @GetMapping("/{id}/comprovante")
+    public ResponseEntity<Comprovante> gerarComprovante(@PathVariable int id) {
+        return ResponseEntity.ok(vendaService.gerarComprovante(id));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
