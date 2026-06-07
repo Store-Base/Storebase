@@ -1,5 +1,8 @@
 package com.storebase.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Orcamento {
 
     private int id;
@@ -9,9 +12,11 @@ public class Orcamento {
     private int usuarioId;
     private String nomeComprador;
     private String cpfCnpj;
+    private List<ItemOrcamento> itens;
 
     public Orcamento() {
         this.status = "aberto";
+        this.itens = new ArrayList<>();
     }
 
     public Orcamento(int clienteId, int usuarioId, String nomeComprador, String cpfCnpj) {
@@ -20,6 +25,13 @@ public class Orcamento {
         this.nomeComprador = nomeComprador;
         this.cpfCnpj = cpfCnpj;
         this.status = "aberto";
+        this.itens = new ArrayList<>();
+    }
+
+    public void calcularTotal() {
+        this.valorTotal = itens.stream()
+                .mapToDouble(ItemOrcamento::getSubtotal)
+                .sum();
     }
 
     public int getId() { return id; }
@@ -42,4 +54,7 @@ public class Orcamento {
 
     public String getCpfCnpj() { return cpfCnpj; }
     public void setCpfCnpj(String cpfCnpj) { this.cpfCnpj = cpfCnpj; }
+
+    public List<ItemOrcamento> getItens() { return itens; }
+    public void setItens(List<ItemOrcamento> itens) { this.itens = itens; }
 }
