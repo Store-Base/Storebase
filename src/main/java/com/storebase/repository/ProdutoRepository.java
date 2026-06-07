@@ -115,6 +115,21 @@ public class ProdutoRepository {
         return Optional.empty();
     }
 
+    public List<Produto> listarEstoqueBaixo(int limite) {
+        List<Produto> lista = new ArrayList<>();
+        String sql = "SELECT * FROM produto WHERE quantidade_estoque <= ? ORDER BY quantidade_estoque ASC";
+        try (Connection conn = AppConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limite);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) lista.add(mapear(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar estoque baixo: " + e.getMessage());
+        }
+        return lista;
+    }
+
     private Produto mapear(ResultSet rs) throws SQLException {
         Produto p = new Produto();
         p.setId(rs.getInt("id"));

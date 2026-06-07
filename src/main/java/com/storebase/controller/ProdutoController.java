@@ -63,6 +63,11 @@ public class ProdutoController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/estoque-baixo")
+    public List<Produto> listarEstoqueBaixo(@RequestParam(defaultValue = "10") int limite) {
+        return produtoService.listarEstoqueBaixo(limite);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());

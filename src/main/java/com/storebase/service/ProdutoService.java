@@ -58,6 +58,10 @@ public class ProdutoService {
         return produtoRepository.buscarPorCodigo(codigo);
     }
 
+    public List<Produto> listarEstoqueBaixo(int limite) {
+        return produtoRepository.listarEstoqueBaixo(limite);
+    }
+
     public void registrarEntrada(int produtoId, int quantidade) {
         if (quantidade <= 0) {
             throw new IllegalArgumentException("Quantidade de entrada deve ser maior que zero.");
