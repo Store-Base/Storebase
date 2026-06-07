@@ -57,4 +57,13 @@ public class ProdutoService {
     public Optional<Produto> buscarPorCodigo(String codigo) {
         return produtoRepository.buscarPorCodigo(codigo);
     }
+
+    public void registrarEntrada(int produtoId, int quantidade) {
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("Quantidade de entrada deve ser maior que zero.");
+        }
+        Produto produto = buscarPorId(produtoId);
+        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() + quantidade);
+        produtoRepository.atualizar(produto);
+    }
 }

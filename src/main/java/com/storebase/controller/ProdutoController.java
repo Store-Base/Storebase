@@ -1,5 +1,6 @@
 package com.storebase.controller;
 
+import com.storebase.model.EntradaEstoque;
 import com.storebase.model.Produto;
 import com.storebase.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,12 @@ public class ProdutoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id) {
         produtoService.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/estoque")
+    public ResponseEntity<Void> registrarEntrada(@PathVariable int id, @RequestBody EntradaEstoque entrada) {
+        produtoService.registrarEntrada(id, entrada.getQuantidade());
         return ResponseEntity.noContent().build();
     }
 
