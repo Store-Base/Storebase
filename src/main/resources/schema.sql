@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS pedido (
     id SERIAL PRIMARY KEY,
     data TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     valor_total DECIMAL(10, 2) NOT NULL,
+    desconto DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    forma_pagamento VARCHAR(50),
     status VARCHAR(50) NOT NULL,
     cliente_id INT NOT NULL,
     usuario_id INT NOT NULL,

@@ -2,6 +2,7 @@ package com.storebase.controller;
 
 import com.storebase.model.ItemOrcamento;
 import com.storebase.model.Orcamento;
+import com.storebase.model.Venda;
 import com.storebase.service.OrcamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,12 @@ public class OrcamentoController {
     public ResponseEntity<Void> removerItem(@PathVariable int id, @PathVariable int produtoId) {
         orcamentoService.removerItem(id, produtoId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/converter")
+    public ResponseEntity<Venda> converter(@PathVariable int id) {
+        Venda venda = orcamentoService.converterEmVenda(id);
+        return ResponseEntity.status(201).body(venda);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

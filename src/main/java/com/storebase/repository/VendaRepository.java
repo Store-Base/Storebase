@@ -21,12 +21,14 @@ public class VendaRepository {
         try {
             conn.setAutoCommit(false);
 
-            String sqlPedido = "INSERT INTO pedido (valor_total, status, cliente_id, usuario_id) VALUES (?, ?, ?, ?)";
+            String sqlPedido = "INSERT INTO pedido (valor_total, desconto, forma_pagamento, status, cliente_id, usuario_id) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setDouble(1, venda.getValorTotal());
-                stmt.setString(2, venda.getStatus());
-                stmt.setInt(3, venda.getCliente().getId());
-                stmt.setInt(4, venda.getFuncionario().getId());
+                stmt.setDouble(2, venda.getDesconto());
+                stmt.setString(3, venda.getFormaPagamento());
+                stmt.setString(4, venda.getStatus());
+                stmt.setInt(5, venda.getCliente().getId());
+                stmt.setInt(6, venda.getFuncionario().getId());
                 stmt.executeUpdate();
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) venda.setId(rs.getInt(1));
@@ -54,7 +56,7 @@ public class VendaRepository {
     }
 
     public Optional<Venda> buscarPorId(int id) {
-        String sql = "SELECT v.id, v.valor_total, v.status, v.data, " +
+        String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, " +
                      "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
                      "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
                      "FROM pedido v " +
@@ -79,7 +81,7 @@ public class VendaRepository {
 
     public List<Venda> listarTodas() {
         List<Venda> lista = new ArrayList<>();
-        String sql = "SELECT v.id, v.valor_total, v.status, v.data, " +
+        String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, " +
                      "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
                      "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
                      "FROM pedido v " +
@@ -102,7 +104,7 @@ public class VendaRepository {
 
     public List<Venda> listarPorCliente(int clienteId) {
         List<Venda> lista = new ArrayList<>();
-        String sql = "SELECT v.id, v.valor_total, v.status, v.data, " +
+        String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, " +
                      "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
                      "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
                      "FROM pedido v " +
@@ -157,6 +159,8 @@ public class VendaRepository {
         Venda v = new Venda();
         v.setId(rs.getInt("id"));
         v.setValorTotal(rs.getDouble("valor_total"));
+        v.setDesconto(rs.getDouble("desconto"));
+        v.setFormaPagamento(rs.getString("forma_pagamento"));
         v.setStatus(rs.getString("status"));
         v.setData(rs.getDate("data").toLocalDate());
         Cliente c = new Cliente();

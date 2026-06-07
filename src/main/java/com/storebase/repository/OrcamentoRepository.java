@@ -155,6 +155,18 @@ public class OrcamentoRepository {
         }
     }
 
+    public void atualizarStatus(int id, String status) {
+        String sql = "UPDATE orcamento SET status = ? WHERE id = ?";
+        try (Connection conn = AppConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar status do orcamento: " + e.getMessage());
+        }
+    }
+
     public void atualizarValorTotal(int orcamentoId, double valorTotal) {
         String sql = "UPDATE orcamento SET valor_total = ? WHERE id = ?";
         try (Connection conn = AppConfig.getConnection();
