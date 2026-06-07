@@ -128,6 +128,45 @@ public class OrcamentoRepository {
         return itens;
     }
 
+    public void adicionarItem(int orcamentoId, ItemOrcamento item) {
+        String sql = "INSERT INTO item_orcamento (orcamento_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?) " +
+                     "ON CONFLICT (orcamento_id, produto_id) DO UPDATE SET quantidade = EXCLUDED.quantidade, preco_unitario = EXCLUDED.preco_unitario";
+        try (Connection conn = AppConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, orcamentoId);
+            stmt.setInt(2, item.getProduto().getId());
+            stmt.setInt(3, item.getQuantidade());
+            stmt.setDouble(4, item.getPrecoUnitario());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao adicionar item ao orcamento: " + e.getMessage());
+        }
+    }
+
+    public void removerItem(int orcamentoId, int produtoId) {
+        String sql = "DELETE FROM item_orcamento WHERE orcamento_id = ? AND produto_id = ?";
+        try (Connection conn = AppConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, orcamentoId);
+            stmt.setInt(2, produtoId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao remover item do orcamento: " + e.getMessage());
+        }
+    }
+
+    public void atualizarValorTotal(int orcamentoId, double valorTotal) {
+        String sql = "UPDATE orcamento SET valor_total = ? WHERE id = ?";
+        try (Connection conn = AppConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, valorTotal);
+            stmt.setInt(2, orcamentoId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar valor total do orcamento: " + e.getMessage());
+        }
+    }
+
     private Orcamento mapear(ResultSet rs) throws SQLException {
         Orcamento o = new Orcamento();
         o.setId(rs.getInt("id"));
