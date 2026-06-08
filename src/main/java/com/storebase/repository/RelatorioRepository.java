@@ -60,8 +60,8 @@ public class RelatorioRepository {
 
     public Map<String, Double> calcularFaturamento(LocalDate dataInicio, LocalDate dataFim) {
         Map<String, Double> resultado = new HashMap<>();
-        String sql = "SELECT COALESCE(SUM(valor_total + desconto), 0) AS bruto, " +
-                     "COALESCE(SUM(valor_total), 0) AS liquido " +
+        String sql = "SELECT COALESCE(SUM(valor_total), 0) AS bruto, " +
+                     "COALESCE(SUM(valor_total - desconto), 0) AS liquido " +
                      "FROM pedido " +
                      "WHERE DATE(data) BETWEEN ? AND ?";
         try (Connection conn = AppConfig.getConnection();

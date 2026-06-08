@@ -41,7 +41,7 @@ public class VendaRepository {
                     stmt.setInt(1, venda.getId());
                     stmt.setInt(2, item.getProduto().getId());
                     stmt.setInt(3, item.getQuantidade());
-                    stmt.setDouble(4, item.getProduto().getPrecoVenda());
+                    stmt.setDouble(4, item.getSubtotal() / item.getQuantidade());
                     stmt.executeUpdate();
                 }
             }

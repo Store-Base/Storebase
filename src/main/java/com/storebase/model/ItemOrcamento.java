@@ -15,7 +15,7 @@ public class ItemOrcamento {
         this.produto = produto;
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;
-        this.subtotal = quantidade * precoUnitario;
+        calcularSubtotal();
     }
 
     public void calcularSubtotal() {
