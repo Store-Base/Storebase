@@ -1,11 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StoreBase — Sistema de Gerenciamento de Loja</title>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+  
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
+
+  
+  <div id="global-spinner" style="display:none">
+    <div class="spinner"></div>
+  </div>
+
+  
+  <dialog id="main-modal">
+    <div class="modal-header">
+      <span class="modal-title"></span>
+      <button class="modal-close" onclick="closeModal('main-modal')">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="modal-body"></div>
+    <div class="modal-footer"></div>
+  </dialog>
+
+ 
+  <dialog id="confirm-dialog">
+    <div class="confirm-content">
+      <div class="confirm-title"></div>
+      <div class="confirm-desc"></div>
+    </div>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('confirm-dialog').close()">Cancelar</button>
+      <button class="btn btn-primary" id="confirm-btn">Confirmar</button>
+    </div>
+  </dialog>
+
+  
+  <div id="page-login" style="display:flex">
+    <div class="login-card">
+      <div class="login-header">
+        <i data-lucide="store"></i>
+        <span class="app-name">LojaSys</span>
+        <p class="app-sub">Sistema de Gerenciamento de Loja</p>
+      </div>
+      <form class="login-form" id="login-form" onsubmit="return false">
+        <div class="form-group">
+          <label for="login-user">Login</label>
+          <input class="input" id="login-user" type="text" placeholder="Seu usuário de acesso" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-pass">Senha</label>
+          <div class="password-group">
+            <input class="input" id="login-pass" type="password" placeholder="Sua senha" autocomplete="current-password">
+            <button type="button" class="toggle-pass" id="toggle-pass-btn">
+              <i data-lucide="eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-full">
+          <i data-lucide="log-in"></i> Entrar
+        </button>
+        <div class="demo-box">
+          <p><strong>Credenciais de demonstração:</strong></p>
+          <p>leo.admin / admin123 — Administrador</p>
+          <p>vini.vendas / vend123 — Vendedor</p>
+          <p>car.estoque / est123 — Gerente de Estoque</p>
+        </div>
+      </form>
+      <p class="login-footer">POO2 · UTFPR Cornélio Procópio</p>
+    </div>
+  </div>
+
+
+  <div id="main-layout" style="display:none">
+
     
+    <aside id="sidebar">
+      <div class="sidebar-logo">
+        <i data-lucide="store"></i>
+        <span>LojaSys</span>
+      </div>
+      <nav id="sidebar-nav">
+      
+      </nav>
+      <div class="sidebar-user">
+        <div class="sidebar-user-role" id="sidebar-user-role"></div>
+        <div class="sidebar-user-name" id="sidebar-user-name"></div>
+        <button class="btn-logout" onclick="App.logout()">
+          <i data-lucide="log-out"></i> Sair
+        </button>
+      </div>
+    </aside>
+
+  
+    <div class="content-wrapper">
+      <header id="header">
+        <h1 id="header-title"></h1>
+      </header>
+
+      <main id="main-content">
+       
+        <section id="page-dashboard"    style="display:none"></section>
+        <section id="page-produtos"     style="display:none"></section>
+        <section id="page-clientes"     style="display:none"></section>
+        <section id="page-funcionarios" style="display:none"></section>
+        <section id="page-orcamentos"   style="display:none"></section>
+        <section id="page-vendas"       style="display:none"></section>
+        <section id="page-nova-venda"   style="display:none"></section>
+        <section id="page-estoque"      style="display:none"></section>
+        <section id="page-relatorios"   style="display:none"></section>
+      </main>
+    </div>
+
+  </div>
+
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+ 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <script src="js/utils.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/router.js"></script>
+
+
+  <script>const Pages = {};</script>
+
+  <script src="js/pages/login.js"></script>
+  <script src="js/pages/dashboard.js"></script>
+  <script src="js/pages/produtos.js"></script>
+  <script src="js/pages/clientes.js"></script>
+  <script src="js/pages/funcionarios.js"></script>
+  <script src="js/pages/orcamentos.js"></script>
+  <script src="js/pages/vendas.js"></script>
+  <script src="js/pages/nova-venda.js"></script>
+  <script src="js/pages/estoque.js"></script>
+  <script src="js/pages/relatorios.js"></script>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.init();
+      lucide.createIcons();
+
+      if (App.user) {
+        Router.navigate('dashboard');
+      } else {
+        Router.navigate('login');
+      }
+    });
+  </script>
+
 </body>
 </html>
