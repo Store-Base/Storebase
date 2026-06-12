@@ -1,0 +1,67 @@
+:root {
+  --loja-primary:       #1E3A5F;
+  --loja-primary-light: #2a5080;
+  --loja-primary-dark:  #162d4a;
+  --loja-success:       #28A745;
+  --loja-error:         #DC3545;
+  --loja-warning:       #fd7e14;
+  --loja-info:          #17a2b8;
+  --loja-card:          #F4F6F9;
+  --loja-card-border:   #e2e6ea;
+  --loja-bg:            #f0f2f5;
+  --loja-text:          #1a1a1a;
+  --loja-text-muted:    #6c757d;
+  --loja-white:         #ffffff;
+  --loja-border:        #dee2e6;
+  --radius:             0.625rem;
+  --radius-sm:          0.375rem;
+  --shadow-sm:          0 1px 3px rgba(0,0,0,0.08);
+  --shadow:             0 2px 8px rgba(0,0,0,0.10);
+  --shadow-lg:          0 8px 24px rgba(0,0,0,0.15);
+  --sidebar-width:      240px;
+  --header-height:      60px;
+  --font-family:        'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: var(--loja-text);
+  background: var(--loja-bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: var(--font-family);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input, select, textarea {
+  font-family: var(--font-family);
+  font-size: 14px;
+}
+
+a {
+  color: var(--loja-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c1c9d2; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a0aab4; }
