@@ -12,6 +12,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -108,6 +109,87 @@ public class RelatorioRepository {
             }
         } catch (SQLException e) {
             System.err.println("Erro ao listar mais vendidos: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public List<Map<String, Object>> listarFaturamentoPorAno(int ano) {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        String sql = "SELECT TO_CHAR(DATE_TRUNC('month', data), 'Mon') AS mes, " +
+                     "EXTRACT(MONTH FROM data) AS mes_num, " +
+                     "COALESCE(SUM(valor_total), 0) AS bruto, " +
+                     "COALESCE(SUM(valor_total - desconto), 0) AS liquido " +
+                     "FROM pedido " +
+                     "WHERE EXTRACT(YEAR FROM data) = ? " +
+                     "GROUP BY DATE_TRUNC('month', data), EXTRACT(MONTH FROM data) " +
+                     "ORDER BY mes_num";
+        try (Connection conn = AppConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, ano);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("mes", rs.getString("mes"));
+                    item.put("receitaBruta", rs.getDouble("bruto"));
+                    item.put("receitaLiquida", rs.getDouble("liquido"));
+                    lista.add(item);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar faturamento por ano: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public List<Map<String, Object>> listarClientesComHistorico() {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        String sql = "SELECT c.nome, c.cpf, " +
+                     "COUNT(v.id) AS qtd_compras, " +
+                     "COALESCE(SUM(v.valor_total - v.desconto), 0) AS total_compras " +
+                     "FROM cliente c " +
+                     "LEFT JOIN pedido v ON c.id = v.cliente_id " +
+                     "GROUP BY c.id, c.nome, c.cpf " +
+                     "ORDER BY total_compras DESC";
+        try (Connection conn = AppConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("nome", rs.getString("nome"));
+                item.put("cpf", rs.getString("cpf"));
+                item.put("qtdCompras", rs.getInt("qtd_compras"));
+                item.put("totalCompras", rs.getDouble("total_compras"));
+                lista.add(item);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar clientes com historico: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public List<Map<String, Object>> listarProdutosPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        String sql = "SELECT p.nome AS produto, SUM(ip.quantidade) AS quantidade_vendida " +
+                     "FROM item_pedido ip " +
+                     "JOIN produto p ON ip.produto_id = p.id " +
+                     "JOIN pedido v ON ip.pedido_id = v.id " +
+                     "WHERE DATE(v.data) BETWEEN ? AND ? " +
+                     "GROUP BY p.id, p.nome " +
+                     "ORDER BY quantidade_vendida DESC";
+        try (Connection conn = AppConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(dataInicio));
+            stmt.setDate(2, Date.valueOf(dataFim));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("produto", rs.getString("produto"));
+                    item.put("quantidadeVendida", rs.getInt("quantidade_vendida"));
+                    lista.add(item);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar produtos por periodo: " + e.getMessage());
         }
         return lista;
     }

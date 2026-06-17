@@ -179,6 +179,71 @@ public class OrcamentoRepository {
         }
     }
 
+    public void deletar(int id) {
+        Connection conn = AppConfig.getConnection();
+        try {
+            conn.setAutoCommit(false);
+            String sqlItens = "DELETE FROM item_orcamento WHERE orcamento_id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlItens)) {
+                stmt.setInt(1, id);
+                stmt.executeUpdate();
+            }
+            String sqlOrc = "DELETE FROM orcamento WHERE id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlOrc)) {
+                stmt.setInt(1, id);
+                stmt.executeUpdate();
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            try { conn.rollback(); } catch (SQLException ex) { System.err.println(ex.getMessage()); }
+            System.err.println("Erro ao deletar orcamento: " + e.getMessage());
+        } finally {
+            try { conn.setAutoCommit(true); } catch (SQLException e) { System.err.println(e.getMessage()); }
+        }
+    }
+
+    public void atualizar(Orcamento orc) {
+        Connection conn = AppConfig.getConnection();
+        try {
+            conn.setAutoCommit(false);
+
+            String sqlOrc = "UPDATE orcamento SET valor_total=?, cliente_id=?, usuario_id=?, nome_comprador=? WHERE id=?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlOrc)) {
+                stmt.setDouble(1, orc.getValorTotal());
+                if (orc.getClienteId() > 0) stmt.setInt(2, orc.getClienteId());
+                else stmt.setNull(2, Types.INTEGER);
+                stmt.setInt(3, orc.getUsuarioId());
+                stmt.setString(4, orc.getNomeComprador());
+                stmt.setInt(5, orc.getId());
+                stmt.executeUpdate();
+            }
+
+            String sqlDel = "DELETE FROM item_orcamento WHERE orcamento_id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlDel)) {
+                stmt.setInt(1, orc.getId());
+                stmt.executeUpdate();
+            }
+
+            String sqlItem = "INSERT INTO item_orcamento (orcamento_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)";
+            for (ItemOrcamento item : orc.getItens()) {
+                try (PreparedStatement stmt = conn.prepareStatement(sqlItem)) {
+                    stmt.setInt(1, orc.getId());
+                    stmt.setInt(2, item.getProduto().getId());
+                    stmt.setInt(3, item.getQuantidade());
+                    stmt.setDouble(4, item.getPrecoUnitario());
+                    stmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            try { conn.rollback(); } catch (SQLException ex) { System.err.println(ex.getMessage()); }
+            System.err.println("Erro ao atualizar orcamento: " + e.getMessage());
+        } finally {
+            try { conn.setAutoCommit(true); } catch (SQLException e) { System.err.println(e.getMessage()); }
+        }
+    }
+
     private Orcamento mapear(ResultSet rs) throws SQLException {
         Orcamento o = new Orcamento();
         o.setId(rs.getInt("id"));

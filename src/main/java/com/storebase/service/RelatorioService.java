@@ -40,4 +40,19 @@ public class RelatorioService {
         }
         return relatorioRepository.listarMaisVendidos(limite);
     }
+
+    public List<Map<String, Object>> listarFaturamentoPorAno(int ano) {
+        return relatorioRepository.listarFaturamentoPorAno(ano);
+    }
+
+    public List<Map<String, Object>> listarClientesComHistorico() {
+        return relatorioRepository.listarClientesComHistorico();
+    }
+
+    public List<Map<String, Object>> listarProdutosPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
+        if (dataInicio.isAfter(dataFim)) {
+            throw new IllegalArgumentException("Data de inicio nao pode ser posterior a data de fim.");
+        }
+        return relatorioRepository.listarProdutosPorPeriodo(dataInicio, dataFim);
+    }
 }

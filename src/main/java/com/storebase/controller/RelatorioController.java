@@ -32,10 +32,21 @@ public class RelatorioController {
     }
 
     @GetMapping("/faturamento")
-    public Map<String, Double> calcularFaturamento(
+    public List<Map<String, Object>> calcularFaturamentoPorAno(
+            @RequestParam int ano) {
+        return relatorioService.listarFaturamentoPorAno(ano);
+    }
+
+    @GetMapping("/produtos")
+    public List<Map<String, Object>> listarProdutosPorPeriodo(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
-        return relatorioService.calcularFaturamento(dataInicio, dataFim);
+        return relatorioService.listarProdutosPorPeriodo(dataInicio, dataFim);
+    }
+
+    @GetMapping("/clientes")
+    public List<Map<String, Object>> listarClientesComHistorico() {
+        return relatorioService.listarClientesComHistorico();
     }
 
     @GetMapping("/produtos-mais-vendidos")

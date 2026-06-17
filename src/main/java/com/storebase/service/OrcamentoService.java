@@ -29,6 +29,16 @@ public class OrcamentoService {
         orcamentoRepository.cadastrar(orcamento);
     }
 
+    public void atualizar(Orcamento orcamento) {
+        buscarPorId(orcamento.getId());
+        orcamentoRepository.atualizar(orcamento);
+    }
+
+    public void deletar(int id) {
+        buscarPorId(id);
+        orcamentoRepository.deletar(id);
+    }
+
     public Orcamento buscarPorId(int id) {
         return orcamentoRepository.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Orcamento nao encontrado com id: " + id));
