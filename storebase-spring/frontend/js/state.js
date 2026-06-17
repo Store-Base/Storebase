@@ -38,9 +38,9 @@ const App = {
     if (spinner) spinner.style.display = v ? 'flex' : 'none';
   },
 
-  isAdmin()   { return this.user?.cargo === 'ADMINISTRADOR'; },
-  isVendedor(){ return this.user?.cargo === 'VENDEDOR'; },
-  isEstoque() { return this.user?.cargo === 'GERENTE_ESTOQUE'; },
+  isAdmin()   { return this.user?.cargo?.toUpperCase() === 'ADMINISTRADOR'; },
+  isVendedor(){ return this.user?.cargo?.toUpperCase() === 'VENDEDOR'; },
+  isEstoque() { return this.user?.cargo?.toUpperCase() === 'GERENTE_ESTOQUE'; },
 
   hasRole(...roles) { return roles.includes(this.user?.cargo); },
 };
