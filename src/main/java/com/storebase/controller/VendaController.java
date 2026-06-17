@@ -1,13 +1,20 @@
 package com.storebase.controller;
 
+import com.storebase.model.Cliente;
 import com.storebase.model.Comprovante;
+import com.storebase.model.Funcionario;
+import com.storebase.model.ItemVenda;
+import com.storebase.model.Produto;
 import com.storebase.model.Venda;
 import com.storebase.service.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/vendas")

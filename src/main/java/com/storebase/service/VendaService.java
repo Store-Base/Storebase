@@ -30,7 +30,8 @@ public class VendaService {
             Produto produtoDoBanco = produtoRepository.buscarPorId(item.getProduto().getId())
                     .orElseThrow(() -> new IllegalArgumentException(
                             "Produto não encontrado com id: " + item.getProduto().getId()));
-            item.setProduto(produtoDoBanco); // substitui o objeto parcial pelo completo
+            item.setProduto(produtoDoBanco);
+            item.calcularSubtotal(); // recalcula com o preço real do banco
 
             if (produtoDoBanco.getQuantidadeEstoque() < item.getQuantidade()) {
                 throw new IllegalArgumentException(
@@ -41,6 +42,9 @@ public class VendaService {
         }
 
         venda.calcularTotal();
+        if (venda.getDesconto() > 0) {
+            venda.aplicarDesconto(venda.getDesconto());
+        }
         vendaRepository.salvar(venda);
 
         for (ItemVenda item : venda.getItens()) {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,11 +47,20 @@ public class FuncionarioController {
     }
 
     @PostMapping("/autenticar")
-    public ResponseEntity<Funcionario> autenticar(@RequestBody Map<String, String> credenciais) {
+    public ResponseEntity<Map<String, Object>> autenticar(@RequestBody Map<String, String> credenciais) {
         String login = credenciais.get("login");
         String senha = credenciais.get("senha");
         Funcionario funcionario = funcionarioService.autenticar(login, senha);
-        return ResponseEntity.ok(funcionario);
+
+        String token = "token-" + funcionario.getId() + "-" + System.currentTimeMillis();
+
+        Map<String, Object> resposta = new LinkedHashMap<>();
+        resposta.put("id",    funcionario.getId());
+        resposta.put("nome",  funcionario.getNome());
+        resposta.put("cargo", funcionario.getCargo());
+        resposta.put("token", token);
+
+        return ResponseEntity.ok(resposta);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
