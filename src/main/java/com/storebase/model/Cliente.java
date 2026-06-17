@@ -44,6 +44,10 @@ public class Cliente {
         this.historicoCompras = historicoCompras;
     }
 
+    private String telefone;
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+
     @Override
     public String toString() {
         return "Cliente{id=" + id + ", nome='" + nome + "', cpf='" + cpf

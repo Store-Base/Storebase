@@ -188,6 +188,8 @@ public class OrcamentoRepository {
         o.setUsuarioId(rs.getInt("usuario_id"));
         o.setNomeComprador(rs.getString("nome_comprador"));
         o.setCpfCnpj(rs.getString("cpf_cnpj"));
+        Timestamp ts = rs.getTimestamp("data");
+        if (ts != null) o.setData(ts.toLocalDateTime().toLocalDate().toString());
         return o;
     }
 }

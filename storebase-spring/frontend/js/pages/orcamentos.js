@@ -91,16 +91,35 @@ Pages.orcamentos = {
     `;
   },
 
-  _openForm(id) {
+  async _openForm(id) {
     App.editingId = id;
     const isEdit = id !== null;
-    const orc = isEdit ? mockOrcamentos.find(x => x.id === id) : null;
 
-    const clienteOptions = mockClientes.map(c =>
+    App.setLoading(true);
+    let clientes = [];
+    let produtos  = [];
+    let orc       = null;
+    try {
+      [clientes, produtos] = await Promise.all([
+        apiFetch('/clientes'),
+        apiFetch('/produtos'),
+      ]);
+      if (clientes && clientes.content) clientes = clientes.content;
+      if (produtos && produtos.content)  produtos  = produtos.content;
+      if (isEdit) orc = await apiFetch(`/orcamentos/${id}`);
+    } catch (err) {
+      showToast('Erro ao carregar dados do formulário.', 'error');
+      App.setLoading(false);
+      return;
+    } finally {
+      App.setLoading(false);
+    }
+
+    const clienteOptions = clientes.map(c =>
       `<option value="${c.id}" data-nome="${escHtml(c.nome)}" ${orc?.clienteId === c.id ? 'selected' : ''}>${escHtml(c.nome)}</option>`
     ).join('');
 
-    const produtoOptions = mockProdutos.map(p =>
+    const produtoOptions = produtos.map(p =>
       `<option value="${p.id}" data-nome="${escHtml(p.nome)}" data-preco="${p.precoVenda}">${escHtml(p.nome)} — ${fmt(p.precoVenda)}</option>`
     ).join('');
 
@@ -140,7 +159,12 @@ Pages.orcamentos = {
       `,
     });
 
-    this._orcItens = orc ? [...orc.itens] : [];
+    this._orcItens = orc ? orc.itens.map(item => ({
+      produtoId:     item.produto?.id || item.produtoId,
+      nomeProduto:   item.produto?.nome || item.nomeProduto || '',
+      quantidade:    item.quantidade,
+      precoUnitario: item.precoUnitario,
+    })) : [];
     this._updateTotal();
   },
 
@@ -210,7 +234,7 @@ Pages.orcamentos = {
     if (!this._orcItens.length) { showToast('Adicione ao menos um item.', 'warning'); return; }
 
     const total = this._orcItens.reduce((s, i) => s + i.precoUnitario * i.quantidade, 0);
-    const body = { clienteId, clienteNome, itens: this._orcItens, total };
+    const body = { clienteId, clienteNome, usuarioId: App.user?.id || 1, itens: this._orcItens, total };
 
     App.setLoading(true);
     try {

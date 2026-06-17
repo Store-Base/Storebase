@@ -47,9 +47,7 @@ public class VendaController {
             cliente.setId(((Number) body.get("clienteId")).intValue());
             venda.setCliente(cliente);
         } else {
-            Cliente avulso = new Cliente();
-            avulso.setId(1);
-            venda.setCliente(avulso);
+            venda.setCliente(null); // venda avulsa
         }
 
         Funcionario funcionario = new Funcionario();
@@ -86,7 +84,7 @@ public class VendaController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
     }
 }

@@ -27,7 +27,11 @@ public class VendaRepository {
                 stmt.setDouble(2, venda.getDesconto());
                 stmt.setString(3, venda.getFormaPagamento());
                 stmt.setString(4, venda.getStatus());
-                stmt.setInt(5, venda.getCliente().getId());
+                if (venda.getCliente() != null) {
+                    stmt.setInt(5, venda.getCliente().getId());
+                } else {
+                    stmt.setNull(5, java.sql.Types.INTEGER);
+                }
                 stmt.setInt(6, venda.getFuncionario().getId());
                 stmt.executeUpdate();
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -60,7 +64,7 @@ public class VendaRepository {
                      "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
                      "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
                      "FROM pedido v " +
-                     "JOIN cliente c ON v.cliente_id = c.id " +
+                     "LEFT JOIN cliente c ON v.cliente_id = c.id " +
                      "JOIN usuario u ON v.usuario_id = u.id " +
                      "WHERE v.id = ?";
         try (Connection conn = AppConfig.getConnection();
@@ -85,7 +89,7 @@ public class VendaRepository {
                      "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
                      "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
                      "FROM pedido v " +
-                     "JOIN cliente c ON v.cliente_id = c.id " +
+                     "LEFT JOIN cliente c ON v.cliente_id = c.id " +
                      "JOIN usuario u ON v.usuario_id = u.id " +
                      "ORDER BY v.data DESC";
         try (Connection conn = AppConfig.getConnection();
@@ -163,13 +167,16 @@ public class VendaRepository {
         v.setFormaPagamento(rs.getString("forma_pagamento"));
         v.setStatus(rs.getString("status"));
         v.setData(rs.getDate("data").toLocalDate());
-        Cliente c = new Cliente();
-        c.setId(rs.getInt("c_id"));
-        c.setNome(rs.getString("c_nome"));
-        c.setCpf(rs.getString("c_cpf"));
-        c.setEmail(rs.getString("c_email"));
-        c.setEndereco(rs.getString("c_endereco"));
-        v.setCliente(c);
+        int cId = rs.getInt("c_id");
+        if (!rs.wasNull()) {
+            Cliente c = new Cliente();
+            c.setId(cId);
+            c.setNome(rs.getString("c_nome"));
+            c.setCpf(rs.getString("c_cpf"));
+            c.setEmail(rs.getString("c_email"));
+            c.setEndereco(rs.getString("c_endereco"));
+            v.setCliente(c);
+        }
         Funcionario f = new Funcionario();
         f.setId(rs.getInt("u_id"));
         f.setNome(rs.getString("u_nome"));

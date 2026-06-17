@@ -12,6 +12,7 @@ public class Orcamento {
     private int usuarioId;
     private String nomeComprador;
     private String cpfCnpj;
+    private String data;
     private List<ItemOrcamento> itens;
 
     public Orcamento() {
@@ -57,4 +58,11 @@ public class Orcamento {
 
     public List<ItemOrcamento> getItens() { return itens; }
     public void setItens(List<ItemOrcamento> itens) { this.itens = itens; }
+
+    public String getData() { return data; }
+    public void setData(String data) { this.data = data; }
+
+    // Aliases para o frontend
+    public double getTotal() { return this.valorTotal; }
+    public String getClienteNome() { return this.nomeComprador; }
 }

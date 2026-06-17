@@ -65,7 +65,7 @@ public class EstoqueController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public org.springframework.http.ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
-        return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
+    public org.springframework.http.ResponseEntity<java.util.Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
+        return org.springframework.http.ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
     }
 }

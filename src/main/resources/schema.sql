@@ -69,3 +69,6 @@ CREATE TABLE IF NOT EXISTS item_orcamento (
     CONSTRAINT fk_item_orcamento FOREIGN KEY (orcamento_id) REFERENCES orcamento(id) ON DELETE CASCADE,
     CONSTRAINT fk_item_orcamento_produto FOREIGN KEY (produto_id) REFERENCES produto(id)
 );
+
+ALTER TABLE cliente ADD COLUMN IF NOT EXISTS telefone VARCHAR(20);
+ALTER TABLE pedido ALTER COLUMN cliente_id DROP NOT NULL;
