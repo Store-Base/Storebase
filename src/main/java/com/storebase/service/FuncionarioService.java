@@ -27,7 +27,11 @@ public class FuncionarioService {
     }
 
     public void atualizar(Funcionario funcionario) {
-        buscarPorId(funcionario.getId());
+        Funcionario existente = buscarPorId(funcionario.getId());
+        // Mantém a senha atual quando o formulário não envia uma nova
+        if (funcionario.getSenha() == null || funcionario.getSenha().isBlank()) {
+            funcionario.setSenha(existente.getSenha());
+        }
         funcionarioRepository.atualizar(funcionario);
     }
 

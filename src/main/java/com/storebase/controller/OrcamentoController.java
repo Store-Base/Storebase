@@ -22,8 +22,18 @@ public class OrcamentoController {
     private OrcamentoService orcamentoService;
 
     @GetMapping
-    public List<Orcamento> listarTodos() {
-        return orcamentoService.listarTodos();
+    public List<Orcamento> listarTodos(@RequestParam(required = false) String status) {
+        List<Orcamento> todos = orcamentoService.listarTodos();
+        List<Orcamento> result = new ArrayList<>();
+        for (Orcamento o : todos) {
+            // Normaliza o status para o padrão usado pelo frontend (ABERTO/FECHADO)
+            String label = "aberto".equalsIgnoreCase(o.getStatus()) ? "ABERTO" : "FECHADO";
+            o.setStatus(label);
+            if (status == null || status.isBlank() || status.equalsIgnoreCase(label)) {
+                result.add(o);
+            }
+        }
+        return result;
     }
 
     @GetMapping("/{id}")

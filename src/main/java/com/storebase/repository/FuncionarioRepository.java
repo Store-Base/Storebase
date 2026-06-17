@@ -13,13 +13,14 @@ import java.util.Optional;
 public class FuncionarioRepository {
 
     public void salvar(Funcionario funcionario) {
-        String sql = "INSERT INTO usuario (nome, cargo, login, senha) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO usuario (nome, cargo, login, senha, salario) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, funcionario.getNome());
             stmt.setString(2, funcionario.getCargo());
             stmt.setString(3, funcionario.getLogin());
             stmt.setString(4, funcionario.getSenha());
+            stmt.setDouble(5, funcionario.getSalario());
             stmt.executeUpdate();
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) funcionario.setId(rs.getInt(1));
@@ -30,14 +31,15 @@ public class FuncionarioRepository {
     }
 
     public void atualizar(Funcionario funcionario) {
-        String sql = "UPDATE usuario SET nome=?, cargo=?, login=?, senha=? WHERE id=?";
+        String sql = "UPDATE usuario SET nome=?, cargo=?, login=?, senha=?, salario=? WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, funcionario.getNome());
             stmt.setString(2, funcionario.getCargo());
             stmt.setString(3, funcionario.getLogin());
             stmt.setString(4, funcionario.getSenha());
-            stmt.setInt(5, funcionario.getId());
+            stmt.setDouble(5, funcionario.getSalario());
+            stmt.setInt(6, funcionario.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar funcionario: " + e.getMessage());
@@ -103,6 +105,7 @@ public class FuncionarioRepository {
         f.setCargo(rs.getString("cargo"));
         f.setLogin(rs.getString("login"));
         f.setSenha(rs.getString("senha"));
+        f.setSalario(rs.getDouble("salario"));
         return f;
     }
 }

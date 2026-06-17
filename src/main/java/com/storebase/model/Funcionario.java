@@ -7,6 +7,7 @@ public class Funcionario {
     private String cargo;
     private String login;
     private String senha;
+    private double salario;
 
     public Funcionario() {}
 
@@ -31,4 +32,7 @@ public class Funcionario {
 
     public String getSenha() { return senha; }
     public void setSenha(String senha) { this.senha = senha; }
+
+    public double getSalario() { return salario; }
+    public void setSalario(double salario) { this.salario = salario; }
 }

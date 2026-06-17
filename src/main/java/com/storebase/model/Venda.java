@@ -74,4 +74,17 @@ public class Venda {
 
     public LocalDate getData() { return data; }
     public void setData(LocalDate data) { this.data = data; }
+
+    // Aliases para o frontend (estrutura achatada)
+    public double getTotal() { return this.valorTotal; }
+
+    public String getDataHora() { return data != null ? data.toString() : null; }
+
+    public String getClienteNome() {
+        return cliente != null ? cliente.getNome() : "Avulso";
+    }
+
+    public String getFuncionarioNome() {
+        return funcionario != null ? funcionario.getNome() : null;
+    }
 }

@@ -65,10 +65,18 @@ Pages.funcionarios = {
     `;
   },
 
-  _openForm(id) {
+  async _openForm(id) {
     App.editingId = id;
     const isEdit = id !== null;
-    const f = isEdit ? mockFuncionarios.find(x => x.id === id) : null;
+    let f = null;
+    if (isEdit) {
+      try {
+        f = await apiFetch(`/funcionarios/${id}`);
+      } catch (err) {
+        showToast('Erro ao carregar funcionário.', 'error');
+        return;
+      }
+    }
 
     openModal({
       title: isEdit ? 'Editar Funcionário' : 'Novo Funcionário',

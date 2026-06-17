@@ -71,7 +71,7 @@ Pages.produtos = {
               <td><span class="text-mono">${escHtml(p.codigo)}</span></td>
               <td>${escHtml(p.categoria)}</td>
               <td class="text-primary text-bold">${fmt(p.precoVenda)}</td>
-              <td class="text-muted">${fmt(p.precoCusto)}</td>
+              <td class="text-muted">${fmt(p.custo)}</td>
               <td>${stockBadgeHTML(p.quantidadeEstoque)}</td>
               <td>
                 <div class="actions-cell">
@@ -90,10 +90,18 @@ Pages.produtos = {
     `;
   },
 
-  _openForm(id) {
+  async _openForm(id) {
     App.editingId = id;
     const isEdit = id !== null;
-    const p = isEdit ? mockProdutos.find(x => x.id === id) : null;
+    let p = null;
+    if (isEdit) {
+      try {
+        p = await apiFetch(`/produtos/${id}`);
+      } catch (err) {
+        showToast('Erro ao carregar produto.', 'error');
+        return;
+      }
+    }
 
     openModal({
       title: isEdit ? 'Editar Produto' : 'Novo Produto',
@@ -118,7 +126,7 @@ Pages.produtos = {
           </div>
           <div class="form-group">
             <label>Preço de Custo (R$)</label>
-            <input class="input" id="prod-custo" type="number" step="0.01" min="0" value="${p?.precoCusto || ''}">
+            <input class="input" id="prod-custo" type="number" step="0.01" min="0" value="${p?.custo || ''}">
           </div>
           <div class="form-group">
             <label>Quantidade em Estoque</label>
@@ -140,7 +148,7 @@ Pages.produtos = {
     const codigo    = formValue('prod-codigo');
     const categoria = formValue('prod-categoria');
     const precoVenda= parseFloat(formValue('prod-preco')) || 0;
-    const precoCusto= parseFloat(formValue('prod-custo')) || 0;
+    const custo     = parseFloat(formValue('prod-custo')) || 0;
     const qtd       = parseInt(formValue('prod-qtd')) || 0;
 
     if (!nome || !codigo || precoVenda <= 0) {
@@ -150,7 +158,7 @@ Pages.produtos = {
 
     App.setLoading(true);
     try {
-      const body = { nome, codigo, categoria, precoVenda, precoCusto, quantidadeEstoque: qtd };
+      const body = { nome, codigo, categoria, precoVenda, custo, quantidadeEstoque: qtd };
       if (App.editingId) {
         await apiFetch(`/produtos/${App.editingId}`, { method:'PUT', body: JSON.stringify(body) });
         showToast('Produto atualizado com sucesso!', 'success');

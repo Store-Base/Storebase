@@ -24,8 +24,31 @@ public class VendaController {
     private VendaService vendaService;
 
     @GetMapping
-    public List<Venda> listarTodas() {
-        return vendaService.listarTodas();
+    public Map<String, Object> listarTodas(
+            @RequestParam(required = false) String dataInicio,
+            @RequestParam(required = false) String dataFim,
+            @RequestParam(required = false) String formaPagamento) {
+
+        List<Venda> vendas = vendaService.listarTodas();
+
+        List<Venda> filtradas = new ArrayList<>();
+        for (Venda v : vendas) {
+            String dia = v.getData() != null ? v.getData().toString() : "";
+            if (dataInicio != null && !dataInicio.isBlank() && dia.compareTo(dataInicio) < 0) continue;
+            if (dataFim != null && !dataFim.isBlank() && dia.compareTo(dataFim) > 0) continue;
+            if (formaPagamento != null && !formaPagamento.isBlank()
+                    && !formaPagamento.equals(v.getFormaPagamento())) continue;
+            filtradas.add(v);
+        }
+
+        double receita = 0;
+        for (Venda v : filtradas) receita += v.getValorTotal();
+
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("vendas", filtradas);
+        resp.put("totalVendas", filtradas.size());
+        resp.put("receitaPeriodo", receita);
+        return resp;
     }
 
     @GetMapping("/{id}")

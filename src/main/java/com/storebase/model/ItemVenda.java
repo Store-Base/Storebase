@@ -27,6 +27,13 @@ public class ItemVenda {
     public double getSubtotal() { return subtotal; }
     public void setSubtotal(double subtotal) { this.subtotal = subtotal; }
 
+    // Aliases para o frontend
+    public String getNomeProduto() { return produto != null ? produto.getNome() : null; }
+
+    public double getPrecoUnitario() {
+        return quantidade != 0 ? subtotal / quantidade : 0;
+    }
+
     @Override
     public String toString() {
         return "ItemVenda{produto=" + produto.getNome() + ", quantidade=" + quantidade

@@ -84,10 +84,18 @@ Pages.clientes = {
     `;
   },
 
-  _openForm(id) {
+  async _openForm(id) {
     App.editingId = id;
     const isEdit = id !== null;
-    const c = isEdit ? mockClientes.find(x => x.id === id) : null;
+    let c = null;
+    if (isEdit) {
+      try {
+        c = await apiFetch(`/clientes/${id}`);
+      } catch (err) {
+        showToast('Erro ao carregar cliente.', 'error');
+        return;
+      }
+    }
 
     openModal({
       title: isEdit ? 'Editar Cliente' : 'Novo Cliente',

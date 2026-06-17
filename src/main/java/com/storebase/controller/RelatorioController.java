@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,15 +22,41 @@ public class RelatorioController {
     private RelatorioService relatorioService;
 
     @GetMapping("/vendas")
-    public List<Venda> listarVendasPorPeriodo(
+    public Map<String, Object> listarVendasPorPeriodo(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
-        return relatorioService.listarVendasPorPeriodo(dataInicio, dataFim);
+        List<Venda> vendas = relatorioService.listarVendasPorPeriodo(dataInicio, dataFim);
+
+        double totalGeral = 0;
+        Map<String, Double> porPagamento = new LinkedHashMap<>();
+        for (Venda v : vendas) {
+            totalGeral += v.getValorTotal();
+            String fp = v.getFormaPagamento() != null ? v.getFormaPagamento() : "OUTROS";
+            porPagamento.merge(fp, v.getValorTotal(), Double::sum);
+        }
+
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("quantidadeTotal", vendas.size());
+        resp.put("totalGeral", totalGeral);
+        resp.put("porPagamento", porPagamento);
+        return resp;
     }
 
     @GetMapping("/estoque")
-    public List<Produto> listarEstoque() {
-        return relatorioService.listarEstoque();
+    public List<Map<String, Object>> listarEstoque() {
+        List<Produto> produtos = relatorioService.listarEstoque();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Produto p : produtos) {
+            String status = p.getQuantidadeEstoque() < 5 ? "CRITICO"
+                    : p.getQuantidadeEstoque() < 10 ? "BAIXO" : "OK";
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("nomeProduto", p.getNome());
+            m.put("codigo", p.getCodigo());
+            m.put("quantidade", p.getQuantidadeEstoque());
+            m.put("status", status);
+            result.add(m);
+        }
+        return result;
     }
 
     @GetMapping("/faturamento")

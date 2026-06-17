@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS usuario (
     nome VARCHAR(255) NOT NULL,
     cargo VARCHAR(100) NOT NULL,
     login VARCHAR(100) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL
+    senha VARCHAR(255) NOT NULL,
+    salario DECIMAL(10, 2) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS produto (
@@ -71,7 +72,15 @@ CREATE TABLE IF NOT EXISTS item_orcamento (
 );
 
 ALTER TABLE cliente ADD COLUMN IF NOT EXISTS telefone VARCHAR(20);
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS salario DECIMAL(10,2) NOT NULL DEFAULT 0;
 ALTER TABLE pedido ALTER COLUMN cliente_id DROP NOT NULL;
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS desconto DECIMAL(10,2) NOT NULL DEFAULT 0;
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS forma_pagamento VARCHAR(50);
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+
+-- Usuários de demonstração (correspondem às credenciais exibidas na tela de login)
+INSERT INTO usuario (nome, cargo, login, senha) VALUES
+    ('Leonardo Marino', 'ADMINISTRADOR',   'leo.admin',   'admin123'),
+    ('Vinicius Vendas', 'VENDEDOR',         'vini.vendas', 'vend123'),
+    ('Carlos Estoque',  'GERENTE_ESTOQUE',  'car.estoque', 'est123')
+ON CONFLICT (login) DO NOTHING;
