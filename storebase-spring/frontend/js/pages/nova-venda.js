@@ -436,7 +436,8 @@ Pages['nova-venda'] = {
         body: JSON.stringify({
           clienteId:      this._venda.avulso ? null : this._venda.cliente?.id,
           clienteNome:    this._venda.avulso ? 'Avulso' : this._venda.cliente?.nome,
-          itens:          this._venda.itens.map(i => ({ produtoId: i.produtoId, nomeProduto: i.nomeProduto, quantidade: i.quantidade, precoUnitario: i.precoUnitario })),
+          funcionarioId:  App.user?.id,
+          itens:          this._venda.itens.map(i => ({ produtoId: i.produtoId, quantidade: i.quantidade })),
           total,
           desconto:       descontoVal,
           formaPagamento: this._venda.formaPagamento,

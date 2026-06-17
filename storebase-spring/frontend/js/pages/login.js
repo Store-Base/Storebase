@@ -11,7 +11,7 @@ Pages.login = {
 
       App.setLoading(true);
       try {
-        const data = await apiFetch('/auth/login', {
+        const data = await apiFetch('/funcionarios/autenticar', {
           method: 'POST',
           body: JSON.stringify({ login, senha }),
         });
