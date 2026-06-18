@@ -241,11 +241,16 @@ select.input {
 
 
 dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
   border: none;
   border-radius: var(--radius);
   padding: 0;
   max-width: min(var(--modal-width, 520px), 95vw);
   width: 100%;
+  height: fit-content;
+  max-height: 90vh;
   box-shadow: var(--shadow-lg);
   animation: modalIn 0.2s ease;
 }

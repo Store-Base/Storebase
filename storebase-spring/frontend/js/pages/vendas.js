@@ -160,6 +160,7 @@ Pages.vendas = {
           <div style="text-align:right;margin-top:12px">
             ${v.desconto > 0 ? `<div style="color:#888;font-size:13px">Desconto: -${fmt(v.desconto)}</div>` : ''}
             <div style="font-size:18px;font-weight:700;color:var(--loja-primary)">Total: ${fmt(v.total)}</div>
+            ${v.parcelas > 1 ? `<div style="color:#888;font-size:13px;margin-top:2px">${v.parcelas}x de ${fmt(v.valorParcela)}${v.taxaJuros > 0 ? ` · juros ${v.taxaJuros}% por parcela` : ''}</div>` : ''}
           </div>
         `,
         footerHTML: `<button class="btn btn-outline" onclick="closeModal()">Fechar</button>`,

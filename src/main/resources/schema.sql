@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS pedido (
     status VARCHAR(50) NOT NULL,
     cliente_id INT NOT NULL,
     usuario_id INT NOT NULL,
+    parcelas INT NOT NULL DEFAULT 1,
+    taxa_juros DECIMAL(10, 2) NOT NULL DEFAULT 0,
     CONSTRAINT fk_pedido_cliente FOREIGN KEY (cliente_id) REFERENCES cliente(id),
     CONSTRAINT fk_pedido_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
@@ -77,6 +79,8 @@ ALTER TABLE pedido ALTER COLUMN cliente_id DROP NOT NULL;
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS desconto DECIMAL(10,2) NOT NULL DEFAULT 0;
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS forma_pagamento VARCHAR(50);
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+ALTER TABLE pedido ADD COLUMN IF NOT EXISTS parcelas INT NOT NULL DEFAULT 1;
+ALTER TABLE pedido ADD COLUMN IF NOT EXISTS taxa_juros DECIMAL(10,2) NOT NULL DEFAULT 0;
 
 -- Usuários de demonstração (correspondem às credenciais exibidas na tela de login)
 INSERT INTO usuario (nome, cargo, login, senha, salario) VALUES

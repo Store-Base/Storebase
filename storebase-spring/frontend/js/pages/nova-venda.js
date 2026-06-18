@@ -11,8 +11,15 @@ Pages['nova-venda'] = {
       desconto: 0,
       descontoTipo: 'R$',
       formaPagamento: 'PIX',
+      parcelas: 1,
+      juros: 0,
     };
     this._render();
+  },
+
+  _parcelavel() {
+    return this._venda.formaPagamento === 'CARTAO_CREDITO'
+        || this._venda.formaPagamento === 'BOLETO';
   },
 
   _calcTotais() {
@@ -20,7 +27,16 @@ Pages['nova-venda'] = {
     const descontoVal = this._venda.descontoTipo === '%'
       ? (subtotal * this._venda.desconto) / 100
       : this._venda.desconto;
-    return { subtotal, descontoVal, total: Math.max(0, subtotal - descontoVal) };
+    const base = Math.max(0, subtotal - descontoVal);
+
+    const parcelas = this._parcelavel() ? (this._venda.parcelas || 1) : 1;
+    const juros    = this._parcelavel() ? (this._venda.juros || 0) : 0;
+    // Juros simples por parcela: total = base * (1 + (juros% * nº de parcelas))
+    const jurosVal = parcelas > 1 ? base * (juros / 100) * parcelas : 0;
+    const total = base + jurosVal;
+    const valorParcela = parcelas > 0 ? total / parcelas : total;
+
+    return { subtotal, descontoVal, base, jurosVal, total, parcelas, valorParcela };
   },
 
   _render() {
@@ -184,6 +200,20 @@ Pages['nova-venda'] = {
           this._updateTotaisDisplay();
         };
       }
+      const parcelasSelect = document.getElementById('venda-parcelas');
+      if (parcelasSelect) {
+        parcelasSelect.onchange = () => {
+          this._venda.parcelas = parseInt(parcelasSelect.value) || 1;
+          this._updateTotaisDisplay();
+        };
+      }
+      const jurosInput = document.getElementById('venda-juros');
+      if (jurosInput) {
+        jurosInput.oninput = () => {
+          this._venda.juros = parseFloat(jurosInput.value) || 0;
+          this._updateTotaisDisplay();
+        };
+      }
     }
   },
 
@@ -294,7 +324,7 @@ Pages['nova-venda'] = {
   _step3HTML() {
     const formas = ['PIX','DINHEIRO','CARTAO_CREDITO','CARTAO_DEBITO','BOLETO'];
     const labels = { PIX:'PIX', DINHEIRO:'Dinheiro', CARTAO_CREDITO:'Cartão Crédito', CARTAO_DEBITO:'Cartão Débito', BOLETO:'Boleto' };
-    const { subtotal, descontoVal, total } = this._calcTotais();
+    const { subtotal, descontoVal, jurosVal, total, parcelas, valorParcela } = this._calcTotais();
 
     return `
       <h3 style="font-size:15px;font-weight:600;margin-bottom:16px">Forma de Pagamento</h3>
@@ -320,6 +350,22 @@ Pages['nova-venda'] = {
           </select>
         </div>
       </div>
+      ${this._parcelavel() ? `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;align-items:flex-end">
+          <div class="form-group">
+            <label>Parcelas</label>
+            <select class="input" id="venda-parcelas">
+              ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n =>
+                `<option value="${n}" ${this._venda.parcelas===n?'selected':''}>${n}x</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Juros por parcela (% a.m.)</label>
+            <input class="input" id="venda-juros" type="number" min="0" step="0.01"
+              value="${this._venda.juros || ''}" placeholder="Ex: 2.5">
+          </div>
+        </div>
+      ` : ''}
       <div class="totals-box">
         <div class="totals-row">
           <span>Subtotal</span><span>${fmt(subtotal)}</span>
@@ -327,8 +373,14 @@ Pages['nova-venda'] = {
         <div class="totals-row" id="desconto-row" style="${descontoVal > 0 ? '' : 'display:none'}">
           <span style="color:#dc3545">Desconto</span><span style="color:#dc3545">-${fmt(descontoVal)}</span>
         </div>
+        <div class="totals-row" id="juros-row" style="${jurosVal > 0 ? '' : 'display:none'}">
+          <span style="color:#fd7e14">Juros (${parcelas}x)</span><span style="color:#fd7e14">+${fmt(jurosVal)}</span>
+        </div>
         <div class="totals-row total">
           <span>Total</span><span id="total-display">${fmt(total)}</span>
+        </div>
+        <div class="totals-row" id="parcela-info" style="${parcelas > 1 ? '' : 'display:none'};justify-content:flex-end;color:var(--loja-text-muted);font-size:13px">
+          ${parcelas > 1 ? `${parcelas}x de ${fmt(valorParcela)}` : ''}
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:20px">
@@ -344,25 +396,43 @@ Pages['nova-venda'] = {
 
   _selectPagamento(forma) {
     this._venda.formaPagamento = forma;
+    // Parcelamento só vale para crédito/boleto — zera ao trocar para as demais
+    if (!this._parcelavel()) { this._venda.parcelas = 1; this._venda.juros = 0; }
     const body = document.getElementById('wizard-body');
     if (body) { body.innerHTML = this._step3HTML(); this._attachStepListeners(); lucide.createIcons(); }
   },
 
   _updateTotaisDisplay() {
-    const { descontoVal, total } = this._calcTotais();
+    const { descontoVal, jurosVal, total, parcelas, valorParcela } = this._calcTotais();
+
     const totalEl = document.getElementById('total-display');
     if (totalEl) totalEl.textContent = fmt(total);
+
     const descontoRow = document.getElementById('desconto-row');
     if (descontoRow) {
       descontoRow.style.display = descontoVal > 0 ? '' : 'none';
       const cells = descontoRow.querySelectorAll('span');
       if (cells[1]) cells[1].textContent = '-' + fmt(descontoVal);
     }
+
+    const jurosRow = document.getElementById('juros-row');
+    if (jurosRow) {
+      jurosRow.style.display = jurosVal > 0 ? '' : 'none';
+      const cells = jurosRow.querySelectorAll('span');
+      if (cells[0]) cells[0].textContent = `Juros (${parcelas}x)`;
+      if (cells[1]) cells[1].textContent = '+' + fmt(jurosVal);
+    }
+
+    const parcelaInfo = document.getElementById('parcela-info');
+    if (parcelaInfo) {
+      parcelaInfo.style.display = parcelas > 1 ? '' : 'none';
+      parcelaInfo.textContent = parcelas > 1 ? `${parcelas}x de ${fmt(valorParcela)}` : '';
+    }
   },
 
   // ---- STEP 4: Confirmação ----
   _step4HTML() {
-    const { subtotal, descontoVal, total } = this._calcTotais();
+    const { subtotal, descontoVal, jurosVal, total, parcelas, valorParcela } = this._calcTotais();
     const formaLabels = { PIX:'PIX', DINHEIRO:'Dinheiro', CARTAO_CREDITO:'Cartão de Crédito', CARTAO_DEBITO:'Cartão de Débito', BOLETO:'Boleto' };
 
     return `
@@ -393,9 +463,11 @@ Pages['nova-venda'] = {
           <span>Subtotal</span><span>${fmt(subtotal)}</span>
         </div>
         ${descontoVal > 0 ? `<div class="confirmation-row"><span style="color:#dc3545">Desconto</span><span style="color:#dc3545">-${fmt(descontoVal)}</span></div>` : ''}
+        ${jurosVal > 0 ? `<div class="confirmation-row"><span style="color:#fd7e14">Juros (${parcelas}x)</span><span style="color:#fd7e14">+${fmt(jurosVal)}</span></div>` : ''}
         <div class="confirmation-row highlight">
           <span>Total</span><span>${fmt(total)}</span>
         </div>
+        ${parcelas > 1 ? `<div class="confirmation-row"><span>Parcelamento</span><span>${parcelas}x de ${fmt(valorParcela)}</span></div>` : ''}
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:20px;gap:10px">
         <button class="btn btn-outline" onclick="Pages['nova-venda']._prevStep()">
@@ -428,7 +500,7 @@ Pages['nova-venda'] = {
   },
 
   async _finalizar() {
-    const { total, descontoVal } = this._calcTotais();
+    const { total, descontoVal, parcelas } = this._calcTotais();
     App.setLoading(true);
     try {
       await apiFetch('/vendas', {
@@ -441,6 +513,8 @@ Pages['nova-venda'] = {
           total,
           desconto:       descontoVal,
           formaPagamento: this._venda.formaPagamento,
+          parcelas,
+          taxaJuros:      this._parcelavel() ? (this._venda.juros || 0) : 0,
         }),
       });
       showToast('Venda finalizada com sucesso!', 'success');

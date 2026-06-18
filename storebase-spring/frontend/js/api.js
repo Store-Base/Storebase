@@ -17,7 +17,11 @@ async function apiFetch(endpoint, options = {}) {
     throw { status: res.status, message: err.message || 'Erro no servidor.' };
   }
 
-  const data = await res.json();
+  // Respostas sem corpo (ex.: 201 Created, 204 No Content): não há JSON para ler
+  if (res.status === 204) return null;
+  const text = await res.text();
+  if (!text) return null;
+  const data = JSON.parse(text);
 
   // Adaptador: rotas paginadas no frontend, lista simples no backend
   if ((endpoint.startsWith('/produtos') || endpoint.startsWith('/clientes')) &&

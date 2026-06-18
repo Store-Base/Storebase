@@ -15,6 +15,8 @@ public class Venda {
     private String formaPagamento;
     private String status;
     private LocalDate data;
+    private int parcelas = 1;
+    private double taxaJuros;
 
     public Venda() {
         this.itens = new ArrayList<>();
@@ -75,8 +77,18 @@ public class Venda {
     public LocalDate getData() { return data; }
     public void setData(LocalDate data) { this.data = data; }
 
+    public int getParcelas() { return parcelas; }
+    public void setParcelas(int parcelas) { this.parcelas = parcelas > 0 ? parcelas : 1; }
+
+    public double getTaxaJuros() { return taxaJuros; }
+    public void setTaxaJuros(double taxaJuros) { this.taxaJuros = taxaJuros; }
+
     // Aliases para o frontend (estrutura achatada)
     public double getTotal() { return this.valorTotal; }
+
+    public double getValorParcela() {
+        return parcelas > 0 ? valorTotal / parcelas : valorTotal;
+    }
 
     public String getDataHora() { return data != null ? data.toString() : null; }
 

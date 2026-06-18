@@ -45,6 +45,14 @@ public class VendaService {
         if (venda.getDesconto() > 0) {
             venda.aplicarDesconto(venda.getDesconto());
         }
+
+        // Juros de parcelamento (juros simples por parcela) — só para crédito/boleto
+        if (venda.getParcelas() > 1 && venda.getTaxaJuros() > 0) {
+            double base = venda.getValorTotal();
+            double juros = base * (venda.getTaxaJuros() / 100.0) * venda.getParcelas();
+            venda.setValorTotal(base + juros);
+        }
+
         vendaRepository.salvar(venda);
 
         for (ItemVenda item : venda.getItens()) {
