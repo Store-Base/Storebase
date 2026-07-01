@@ -182,7 +182,7 @@ select.input {
   vertical-align: middle;
 }
 
-.table .text-mono { font-family: 'Courier New', monospace; font-size: 12.5px; color: #555; }
+.table .text-mono { font-family: 'Courier New', monospace; font-size: 12.5px; color: var(--loja-text-muted); }
 .table .text-primary { color: var(--loja-primary); font-weight: 700; }
 .table .text-bold { font-weight: 600; }
 
@@ -238,6 +238,18 @@ select.input {
 .page-btn.active { background: var(--loja-primary); color: var(--loja-white); border-color: var(--loja-primary); font-weight: 600; }
 .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .page-btn svg { width: 14px; height: 14px; }
+
+/* Dark mode — tabelas */
+[data-theme="dark"] .table thead th {
+  background: var(--loja-card);
+  border-bottom-color: var(--loja-card-border);
+}
+[data-theme="dark"] .table tbody tr { border-bottom-color: var(--loja-card-border); }
+[data-theme="dark"] .table tbody tr:hover { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .actions-cell button:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--loja-border);
+}
 
 
 dialog {
