@@ -620,3 +620,17 @@ dialog::backdrop {
 .mt-6 { margin-top: 24px; }
 .mb-4 { margin-bottom: 16px; }
 .gap-2 { gap: 8px; }
+
+/* Dark mode — modais */
+[data-theme="dark"] .modal-close:hover { background: var(--loja-card-border); color: var(--loja-text); }
+[data-theme="dark"] .modal-footer { background: var(--loja-card); border-top-color: var(--loja-card-border); }
+[data-theme="dark"] .modal-header { border-bottom-color: var(--loja-card-border); }
+[data-theme="dark"] .confirm-actions { border-top-color: var(--loja-card-border); }
+
+/* Dark mode — botões de estoque */
+[data-theme="dark"] .btn-stock-ajuste {
+  background: var(--loja-card-border);
+  color: var(--loja-text);
+  border-color: var(--loja-border);
+}
+[data-theme="dark"] .btn-stock-ajuste:hover { background: var(--loja-border); }
