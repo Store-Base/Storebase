@@ -5,6 +5,7 @@ const App = {
   editingId: null,
 
   init() {
+    this.initTheme();
     const token = localStorage.getItem('token');
     if (token) {
       this.user = {
@@ -17,6 +18,25 @@ const App = {
     }
   },
 
+  initTheme() {
+    const salvo = localStorage.getItem('loja_tema');
+    let tema;
+    if (salvo === 'dark' || salvo === 'light') {
+      tema = salvo;
+    } else {
+      tema = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', tema);
+  },
+
+  toggleTheme() {
+    const atual = document.documentElement.getAttribute('data-theme');
+    const novo = atual === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', novo);
+    localStorage.setItem('loja_tema', novo);
+    renderSidebar();
+  },
+
   login(userData) {
     localStorage.setItem('token',     userData.token);
     localStorage.setItem('loja_id',   String(userData.id));
@@ -27,7 +47,10 @@ const App = {
   },
 
   logout() {
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('loja_id');
+    localStorage.removeItem('loja_nome');
+    localStorage.removeItem('loja_cargo');
     this.user = null;
     Router.navigate('login');
   },
