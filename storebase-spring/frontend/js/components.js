@@ -16,13 +16,23 @@ function renderSidebar() {
   const nav = document.getElementById('sidebar-nav');
   if (!nav) return;
 
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const themeIcon  = isDark ? 'sun'        : 'moon';
+  const themeLabel = isDark ? 'Modo claro' : 'Modo escuro';
+
   nav.innerHTML = allowed.map(item => `
     <button class="nav-item ${App.page === item.page ? 'active' : ''}"
             onclick="Router.navigate('${item.page}')">
       <i data-lucide="${item.icon}"></i>
       ${escHtml(item.label)}
     </button>
-  `).join('');
+  `).join('') + `
+    <hr class="nav-separator">
+    <button class="nav-item" onclick="App.toggleTheme()" title="${themeLabel}">
+      <i data-lucide="${themeIcon}"></i>
+      ${themeLabel}
+    </button>
+  `;
 
   const userRole = document.getElementById('sidebar-user-role');
   const userName = document.getElementById('sidebar-user-name');
