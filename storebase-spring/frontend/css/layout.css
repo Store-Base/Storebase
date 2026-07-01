@@ -202,3 +202,13 @@ section[id^="page-"] {
   :root { --sidebar-width: 200px; }
   #main-content { padding: 20px 16px; }
 }
+
+[data-theme="dark"] #global-spinner {
+  background: rgba(20, 24, 31, 0.75);
+}
+
+.nav-separator {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  margin: 8px 12px;
+}

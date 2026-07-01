@@ -65,3 +65,21 @@ a:hover {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #c1c9d2; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #a0aab4; }
+
+/* Dark mode */
+[data-theme="dark"] {
+  --loja-bg:          #14181f;
+  --loja-card:        #1c222c;
+  --loja-card-border: #2a323e;
+  --loja-text:        #e8eaed;
+  --loja-text-muted:  #9aa4b2;
+  --loja-white:       #1c222c;
+  --loja-border:      #2a323e;
+}
+
+html {
+  transition: background-color 0.25s, color 0.25s;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #3d4a5a; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #4d5f72; }
