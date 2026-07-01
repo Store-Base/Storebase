@@ -110,7 +110,7 @@
 .form-group label {
   font-size: 13px;
   font-weight: 500;
-  color: #374151;
+  color: var(--loja-text);
 }
 
 .input {
