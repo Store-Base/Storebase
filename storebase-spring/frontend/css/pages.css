@@ -334,3 +334,22 @@
 .historico-item .hist-date { font-size: 12px; color: var(--loja-text-muted); margin-bottom: 4px; }
 .historico-item .hist-total { font-weight: 700; color: var(--loja-primary); }
 .historico-item .hist-items { font-size: 12.5px; color: #555; margin-top: 2px; }
+
+/* Dark mode — páginas */
+[data-theme="dark"] .demo-box {
+  background: var(--loja-card);
+  border-color: var(--loja-border);
+  color: var(--loja-text-muted);
+}
+[data-theme="dark"] .demo-box strong { color: var(--loja-text); }
+
+[data-theme="dark"] .totals-box,
+[data-theme="dark"] .confirmation-box { background: var(--loja-card); }
+
+[data-theme="dark"] .cart-item { border-bottom-color: var(--loja-card-border); }
+[data-theme="dark"] .historico-item { border-bottom-color: var(--loja-card-border); }
+[data-theme="dark"] .historico-item .hist-items { color: var(--loja-text-muted); }
+[data-theme="dark"] .confirmation-row { border-bottom-color: var(--loja-card-border); }
+[data-theme="dark"] .venda-detail-row { border-bottom-color: var(--loja-card-border); }
+
+[data-theme="dark"] .tab-bar { border-bottom-color: var(--loja-card-border); }
