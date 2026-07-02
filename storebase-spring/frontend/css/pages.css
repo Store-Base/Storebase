@@ -337,14 +337,17 @@
 
 /* Dark mode — páginas */
 [data-theme="dark"] .demo-box {
-  background: var(--loja-card);
-  border-color: var(--loja-border);
+  background: #141c2a;
+  border-color: var(--loja-card-border);
   color: var(--loja-text-muted);
 }
 [data-theme="dark"] .demo-box strong { color: var(--loja-text); }
 
 [data-theme="dark"] .totals-box,
-[data-theme="dark"] .confirmation-box { background: var(--loja-card); }
+[data-theme="dark"] .confirmation-box {
+  background: #141c2a;
+  border-color: var(--loja-card-border);
+}
 
 [data-theme="dark"] .cart-item { border-bottom-color: var(--loja-card-border); }
 [data-theme="dark"] .historico-item { border-bottom-color: var(--loja-card-border); }

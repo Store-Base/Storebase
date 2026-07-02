@@ -204,7 +204,17 @@ section[id^="page-"] {
 }
 
 [data-theme="dark"] #global-spinner {
-  background: rgba(20, 24, 31, 0.75);
+  background: rgba(15, 18, 24, 0.8);
+}
+
+[data-theme="dark"] #header {
+  background: var(--loja-card);
+  border-bottom-color: var(--loja-card-border);
+  box-shadow: 0 1px 0 var(--loja-card-border), 0 2px 8px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] #main-content {
+  background: var(--loja-bg);
 }
 
 .nav-separator {
