@@ -2,13 +2,27 @@
   --loja-primary:       #1E3A5F;
   --loja-primary-light: #2a5080;
   --loja-primary-dark:  #162d4a;
+  /* Cor de destaque quando usada como TEXTO (valores, links, totais).
+     No claro é igual à primária; no escuro é um azul claro legível. */
+  --loja-primary-text:  #1E3A5F;
+  /* Fundo da sidebar e do cabeçalho do login — não muda junto com a primária */
+  --loja-sidebar:       #1E3A5F;
+  /* Texto sobre fundos coloridos (botões, sidebar) — branco nos dois temas.
+     Não usar --loja-white para texto: no dark ela vira cor de superfície. */
+  --loja-on-primary:    #ffffff;
   --loja-success:       #28A745;
   --loja-error:         #DC3545;
   --loja-warning:       #fd7e14;
   --loja-info:          #17a2b8;
+  /* Versões para uso como texto (ajustadas no dark para manter contraste) */
+  --loja-success-text:  #28A745;
+  --loja-error-text:    #DC3545;
+  --loja-warning-text:  #fd7e14;
   --loja-card:          #F4F6F9;
   --loja-card-border:   #e2e6ea;
   --loja-bg:            #f0f2f5;
+  /* Fundo rebaixado (caixas de totais, rodapé de modal, thead de tabela) */
+  --loja-inset:         #f8f9fa;
   --loja-text:          #1a1a1a;
   --loja-text-muted:    #6c757d;
   --loja-white:         #ffffff;
@@ -52,7 +66,7 @@ input, select, textarea {
 }
 
 a {
-  color: var(--loja-primary);
+  color: var(--loja-primary-text);
   text-decoration: none;
 }
 
@@ -66,17 +80,26 @@ a:hover {
 ::-webkit-scrollbar-thumb { background: #c1c9d2; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #a0aab4; }
 
-/* Dark mode */
+/* Dark mode
+   Hierarquia de fundos (do mais fundo ao mais elevado):
+   bg #11141a < inset #151a21 < superfície #1a1f28 < hover #232a36 < borda #2c3442 */
 [data-theme="dark"] {
-  --loja-bg:            #0f1218;
-  --loja-card:          #1a2436;
-  --loja-card-border:   #2e4060;
-  --loja-text:          #edf1f5;
-  --loja-text-muted:    #8a9bb0;
-  --loja-white:         #1a2436;
-  --loja-border:        #2e4060;
-  --loja-primary:       #2563a8;
-  --loja-primary-light: #3378c8;
+  --loja-bg:            #11141a;
+  --loja-inset:         #151a21;
+  --loja-white:         #1a1f28;  /* superfície de cards/tabelas/inputs */
+  --loja-card:          #232a36;  /* hover e fundos secundários — mais claro que a superfície */
+  --loja-card-border:   #2c3442;
+  --loja-border:        #323b4a;
+  --loja-text:          #e7ebf0;
+  --loja-text-muted:    #9aa7b8;
+  --loja-primary:       #3573b8;  /* fundo de botões primários */
+  --loja-primary-light: #4a89cf;
+  --loja-primary-dark:  #2c619e;
+  --loja-primary-text:  #7db4e8;  /* texto/links de destaque — ~7.5:1 sobre a superfície */
+  --loja-sidebar:       #151a24;
+  --loja-success-text:  #57c877;
+  --loja-error-text:    #f08492;
+  --loja-warning-text:  #ffab5e;
   --shadow-sm:          0 1px 4px rgba(0,0,0,0.4);
   --shadow:             0 3px 14px rgba(0,0,0,0.5);
   --shadow-lg:          0 8px 32px rgba(0,0,0,0.7);
@@ -86,5 +109,5 @@ html {
   transition: background-color 0.25s, color 0.25s;
 }
 
-[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #2e4060; }
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #3d5278; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #323b4a; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #404b5e; }

@@ -9,13 +9,13 @@
 }
 
 .login-header {
-  background: var(--loja-primary);
+  background: var(--loja-sidebar);
   padding: 32px 28px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: var(--loja-white);
+  color: var(--loja-on-primary);
   text-align: center;
 }
 
@@ -67,12 +67,12 @@
   padding: 4px;
   line-height: 1;
 }
-.password-group .toggle-pass:hover { color: var(--loja-primary); }
+.password-group .toggle-pass:hover { color: var(--loja-primary-text); }
 .password-group .toggle-pass svg { width: 16px; height: 16px; }
 
 .demo-box {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--loja-inset);
+  border: 1px solid var(--loja-card-border);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
   font-size: 12px;
@@ -125,7 +125,7 @@
 }
 
 .last-sales-header span { font-size: 14px; font-weight: 600; }
-.last-sales-header a { font-size: 12.5px; color: var(--loja-primary); }
+.last-sales-header a { font-size: 12.5px; color: var(--loja-primary-text); }
 
 .quick-actions {
   display: flex;
@@ -202,7 +202,7 @@
   font-weight: 600;
 }
 
-.cart-item-total { font-weight: 700; color: var(--loja-primary); min-width: 80px; text-align: right; }
+.cart-item-total { font-weight: 700; color: var(--loja-primary-text); min-width: 80px; text-align: right; }
 
 .cart-item-remove {
   background: transparent;
@@ -216,7 +216,7 @@
 .cart-item-remove svg { width: 15px; height: 15px; }
 
 .totals-box {
-  background: #f8f9fa;
+  background: var(--loja-inset);
   border: 1px solid var(--loja-card-border);
   border-radius: var(--radius-sm);
   padding: 16px;
@@ -233,7 +233,7 @@
 .totals-row.total {
   font-size: 18px;
   font-weight: 700;
-  color: var(--loja-primary);
+  color: var(--loja-primary-text);
   padding-top: 10px;
   margin-top: 8px;
   border-top: 2px solid var(--loja-card-border);
@@ -258,11 +258,12 @@
   transition: all 0.15s;
 }
 
-.payment-opt:hover { border-color: var(--loja-primary-light); color: var(--loja-primary); }
-.payment-opt.selected { border-color: var(--loja-primary); background: rgba(30,58,95,0.05); color: var(--loja-primary); font-weight: 600; }
+.payment-opt:hover { border-color: var(--loja-primary-light); color: var(--loja-primary-text); }
+.payment-opt.selected { border-color: var(--loja-primary); background: rgba(30,58,95,0.05); color: var(--loja-primary-text); font-weight: 600; }
+[data-theme="dark"] .payment-opt.selected { background: rgba(125,180,232,0.12); }
 
 .confirmation-box {
-  background: #f8f9fa;
+  background: var(--loja-inset);
   border: 1px solid var(--loja-card-border);
   border-radius: var(--radius);
   padding: 20px 24px;
@@ -279,7 +280,7 @@
 .confirmation-row:last-child { border-bottom: none; }
 .confirmation-row span:first-child { color: var(--loja-text-muted); }
 .confirmation-row span:last-child { font-weight: 500; }
-.confirmation-row.highlight span:last-child { font-weight: 700; color: var(--loja-primary); font-size: 16px; }
+.confirmation-row.highlight span:last-child { font-weight: 700; color: var(--loja-primary-text); font-size: 16px; }
 
 
 .venda-detail-row {
@@ -313,7 +314,7 @@
 
 .kpi-label { font-size: 12px; color: var(--loja-text-muted); margin-bottom: 6px; }
 .kpi-value { font-size: 28px; font-weight: 700; color: var(--loja-text); line-height: 1.1; }
-.kpi-value.primary { color: var(--loja-primary); }
+.kpi-value.primary { color: var(--loja-primary-text); }
 
 @media print {
   #sidebar, #header, .tab-bar, .filter-bar,
@@ -332,22 +333,12 @@
 
 .historico-item:last-child { border-bottom: none; }
 .historico-item .hist-date { font-size: 12px; color: var(--loja-text-muted); margin-bottom: 4px; }
-.historico-item .hist-total { font-weight: 700; color: var(--loja-primary); }
+.historico-item .hist-total { font-weight: 700; color: var(--loja-primary-text); }
 .historico-item .hist-items { font-size: 12.5px; color: #555; margin-top: 2px; }
 
 /* Dark mode — páginas */
-[data-theme="dark"] .demo-box {
-  background: #141c2a;
-  border-color: var(--loja-card-border);
-  color: var(--loja-text-muted);
-}
+[data-theme="dark"] .demo-box { color: var(--loja-text-muted); }
 [data-theme="dark"] .demo-box strong { color: var(--loja-text); }
-
-[data-theme="dark"] .totals-box,
-[data-theme="dark"] .confirmation-box {
-  background: #141c2a;
-  border-color: var(--loja-card-border);
-}
 
 [data-theme="dark"] .cart-item { border-bottom-color: var(--loja-card-border); }
 [data-theme="dark"] .historico-item { border-bottom-color: var(--loja-card-border); }
