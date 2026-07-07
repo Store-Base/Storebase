@@ -75,17 +75,17 @@ Pages.orcamentos = {
   },
 
   _actionsHTML(orc) {
-    if (orc.status === 'FECHADO') return '<span style="color:#999;font-size:13px">—</span>';
+    if (orc.status === 'FECHADO') return '<span style="color:var(--loja-text-muted);font-size:13px">—</span>';
     return `
       <div class="actions-cell">
         <button onclick="Pages.orcamentos._openForm(${orc.id})" title="Editar">
-          <i data-lucide="pencil" style="color:#6c757d"></i>
+          <i data-lucide="pencil" style="color:var(--loja-text-muted)"></i>
         </button>
         <button onclick="Pages.orcamentos._converter(${orc.id})" title="Converter em Venda" style="color:#28a745">
           <i data-lucide="circle-plus" style="color:#28a745"></i>
         </button>
         <button onclick="Pages.orcamentos._delete(${orc.id})" title="Excluir">
-          <i data-lucide="trash-2" style="color:#dc3545"></i>
+          <i data-lucide="trash-2" style="color:var(--loja-error-text)"></i>
         </button>
       </div>
     `;

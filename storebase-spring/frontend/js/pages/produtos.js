@@ -76,10 +76,10 @@ Pages.produtos = {
               <td>
                 <div class="actions-cell">
                   <button onclick="Pages.produtos._openForm(${p.id})" title="Editar">
-                    <i data-lucide="pencil" style="color:#6c757d"></i>
+                    <i data-lucide="pencil" style="color:var(--loja-text-muted)"></i>
                   </button>
                   <button onclick="Pages.produtos._delete(${p.id},'${escHtml(p.nome)}')" title="Excluir">
-                    <i data-lucide="trash-2" style="color:#dc3545"></i>
+                    <i data-lucide="trash-2" style="color:var(--loja-error-text)"></i>
                   </button>
                 </div>
               </td>

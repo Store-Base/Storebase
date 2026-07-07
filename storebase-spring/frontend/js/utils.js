@@ -24,7 +24,7 @@ function fmtDataHora(iso) {
   const d = new Date(iso);
   const data = d.toLocaleDateString('pt-BR');
   const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  return `<div style="font-weight:600">${data}</div><div style="font-size:12px;color:#888">${hora}</div>`;
+  return `<div style="font-weight:600">${data}</div><div style="font-size:12px;color:var(--loja-text-muted)">${hora}</div>`;
 }
 
 function maskCPF(value) {

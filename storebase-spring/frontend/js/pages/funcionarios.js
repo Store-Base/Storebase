@@ -51,10 +51,10 @@ Pages.funcionarios = {
               <td>
                 <div class="actions-cell">
                   <button onclick="Pages.funcionarios._openForm(${f.id})" title="Editar">
-                    <i data-lucide="pencil" style="color:#6c757d"></i>
+                    <i data-lucide="pencil" style="color:var(--loja-text-muted)"></i>
                   </button>
                   <button onclick="Pages.funcionarios._delete(${f.id},'${escHtml(f.nome)}')" title="Excluir">
-                    <i data-lucide="trash-2" style="color:#dc3545"></i>
+                    <i data-lucide="trash-2" style="color:var(--loja-error-text)"></i>
                   </button>
                 </div>
               </td>

@@ -101,14 +101,14 @@ Pages['nova-venda'] = {
       <div id="cli-resultados" style="margin-bottom:14px"></div>
       ${this._venda.cliente && !this._venda.avulso ? `
         <div class="alert-info alert-banner" style="margin-bottom:14px">
-          <i data-lucide="check-circle" style="color:#004085"></i>
+          <i data-lucide="check-circle" style="color:var(--loja-primary-text)"></i>
           <span>Cliente selecionado: <strong>${escHtml(this._venda.cliente.nome)}</strong></span>
         </div>
       ` : ''}
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <hr style="flex:1;border:none;border-top:1px solid #e0e0e0">
-        <span style="color:#888;font-size:12px">ou</span>
-        <hr style="flex:1;border:none;border-top:1px solid #e0e0e0">
+        <hr style="flex:1;border:none;border-top:1px solid var(--loja-border)">
+        <span style="color:var(--loja-text-muted);font-size:12px">ou</span>
+        <hr style="flex:1;border:none;border-top:1px solid var(--loja-border)">
       </div>
       <button class="btn ${this._venda.avulso ? 'btn-primary' : 'btn-outline'}" onclick="Pages['nova-venda']._selectAvulso()" style="width:100%">
         <i data-lucide="user-x"></i> ${this._venda.avulso ? '✓ Venda Avulsa selecionada' : 'Continuar como Venda Avulsa (sem cliente)'}
@@ -144,7 +144,7 @@ Pages['nova-venda'] = {
             const data = await apiFetch(`/clientes?search=${encodeURIComponent(q)}&size=5`);
             const resultados = document.getElementById('cli-resultados');
             if (!resultados) return;
-            if (!data.content.length) { resultados.innerHTML = '<p style="color:#888;font-size:13px">Nenhum cliente encontrado.</p>'; return; }
+            if (!data.content.length) { resultados.innerHTML = '<p style="color:var(--loja-text-muted);font-size:13px">Nenhum cliente encontrado.</p>'; return; }
             resultados.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">
               ${data.content.map(c => `
                 <button class="btn btn-outline" style="text-align:left;justify-content:flex-start"
@@ -230,7 +230,7 @@ Pages['nova-venda'] = {
           <div class="cart-item">
             <div class="cart-item-name">
               <div>${escHtml(item.nomeProduto)}</div>
-              <div style="font-size:12px;color:#888">Estoque: ${item.estoque} un.</div>
+              <div style="font-size:12px;color:var(--loja-text-muted)">Estoque: ${item.estoque} un.</div>
             </div>
             <div class="cart-qty">
               <button onclick="Pages['nova-venda']._changeQty(${idx}, -1)">−</button>
@@ -263,7 +263,7 @@ Pages['nova-venda'] = {
       <div id="prod-resultados-venda" style="margin-bottom:14px"></div>
       <div style="margin:16px 0 8px;font-weight:600;font-size:13px">Carrinho</div>
       <div id="carrinho-items">${itensHTML}</div>
-      ${this._venda.itens.length ? `<div style="text-align:right;margin-top:8px;font-size:14px;color:#888">Subtotal: <strong style="color:var(--loja-primary)">${fmt(subtotal)}</strong></div>` : ''}
+      ${this._venda.itens.length ? `<div style="text-align:right;margin-top:8px;font-size:14px;color:var(--loja-text-muted)">Subtotal: <strong style="color:var(--loja-primary)">${fmt(subtotal)}</strong></div>` : ''}
       <div style="display:flex;justify-content:space-between;margin-top:20px">
         <button class="btn btn-outline" onclick="Pages['nova-venda']._prevStep()">
           <i data-lucide="chevron-left"></i> Voltar
@@ -371,10 +371,10 @@ Pages['nova-venda'] = {
           <span>Subtotal</span><span>${fmt(subtotal)}</span>
         </div>
         <div class="totals-row" id="desconto-row" style="${descontoVal > 0 ? '' : 'display:none'}">
-          <span style="color:#dc3545">Desconto</span><span style="color:#dc3545">-${fmt(descontoVal)}</span>
+          <span style="color:var(--loja-error-text)">Desconto</span><span style="color:var(--loja-error-text)">-${fmt(descontoVal)}</span>
         </div>
         <div class="totals-row" id="juros-row" style="${jurosVal > 0 ? '' : 'display:none'}">
-          <span style="color:#fd7e14">Juros (${parcelas}x)</span><span style="color:#fd7e14">+${fmt(jurosVal)}</span>
+          <span style="color:var(--loja-warning-text)">Juros (${parcelas}x)</span><span style="color:var(--loja-warning-text)">+${fmt(jurosVal)}</span>
         </div>
         <div class="totals-row total">
           <span>Total</span><span id="total-display">${fmt(total)}</span>
@@ -462,8 +462,8 @@ Pages['nova-venda'] = {
         <div class="confirmation-row">
           <span>Subtotal</span><span>${fmt(subtotal)}</span>
         </div>
-        ${descontoVal > 0 ? `<div class="confirmation-row"><span style="color:#dc3545">Desconto</span><span style="color:#dc3545">-${fmt(descontoVal)}</span></div>` : ''}
-        ${jurosVal > 0 ? `<div class="confirmation-row"><span style="color:#fd7e14">Juros (${parcelas}x)</span><span style="color:#fd7e14">+${fmt(jurosVal)}</span></div>` : ''}
+        ${descontoVal > 0 ? `<div class="confirmation-row"><span style="color:var(--loja-error-text)">Desconto</span><span style="color:var(--loja-error-text)">-${fmt(descontoVal)}</span></div>` : ''}
+        ${jurosVal > 0 ? `<div class="confirmation-row"><span style="color:var(--loja-warning-text)">Juros (${parcelas}x)</span><span style="color:var(--loja-warning-text)">+${fmt(jurosVal)}</span></div>` : ''}
         <div class="confirmation-row highlight">
           <span>Total</span><span>${fmt(total)}</span>
         </div>

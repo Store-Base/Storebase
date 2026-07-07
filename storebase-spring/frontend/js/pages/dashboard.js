@@ -92,7 +92,7 @@ Pages.dashboard = {
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(220,53,69,0.1)">
-          <i data-lucide="alert-triangle" style="color:${stats.alertasEstoque > 0 ? '#dc3545' : '#aaa'}"></i>
+          <i data-lucide="alert-triangle" style="color:${stats.alertasEstoque > 0 ? '#dc3545' : 'var(--loja-text-muted)'}"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Alertas de Estoque</div>
@@ -280,7 +280,7 @@ Pages.dashboard = {
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(220,53,69,0.1)">
-          <i data-lucide="alert-triangle" style="color:${stats.produtosCriticos > 0 ? '#dc3545' : '#aaa'}"></i>
+          <i data-lucide="alert-triangle" style="color:${stats.produtosCriticos > 0 ? '#dc3545' : 'var(--loja-text-muted)'}"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Estoque Crítico</div>
@@ -290,11 +290,11 @@ Pages.dashboard = {
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(255,193,7,0.15)">
-          <i data-lucide="alert-circle" style="color:#856404"></i>
+          <i data-lucide="alert-circle" style="color:var(--loja-warning-text)"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Estoque Baixo</div>
-          <div class="stat-value" style="color:${stats.produtosBaixos > 0 ? '#856404' : 'inherit'}">${stats.produtosBaixos}</div>
+          <div class="stat-value" style="color:${stats.produtosBaixos > 0 ? 'var(--loja-warning-text)' : 'inherit'}">${stats.produtosBaixos}</div>
           <div class="stat-sub">produto(s) entre 5 e 9 un.</div>
         </div>
       </div>
@@ -372,7 +372,7 @@ Pages.dashboard = {
             <tr>
               <td class="text-bold">${escHtml(a.nomeProduto)}</td>
               <td><span class="text-mono">${escHtml(a.codigo)}</span></td>
-              <td><span style="font-weight:700;color:${a.status === 'CRITICO' ? '#dc3545' : '#856404'}">${a.quantidade} un.</span></td>
+              <td><span style="font-weight:700;color:${a.status === 'CRITICO' ? 'var(--loja-error-text)' : 'var(--loja-warning-text)'}">${a.quantidade} un.</span></td>
               <td>${badgeHTML(a.status)}</td>
               <td>
                 <button class="btn-stock-entrada" onclick="Router.navigate('estoque')">

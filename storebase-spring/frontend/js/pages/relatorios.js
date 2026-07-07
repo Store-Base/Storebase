@@ -185,9 +185,9 @@ Pages.relatorios = {
     const critico = items.filter(i => i.status === 'CRITICO').length;
     panel.innerHTML = `
       <div class="grid-3" style="margin-bottom:20px">
-        <div class="kpi-card"><div class="kpi-label">Estoque OK</div><div class="kpi-value" style="color:#155724">${ok}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Estoque Baixo</div><div class="kpi-value" style="color:#856404">${baixo}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Estoque Crítico</div><div class="kpi-value" style="color:#721c24">${critico}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Estoque OK</div><div class="kpi-value" style="color:var(--loja-success-text)">${ok}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Estoque Baixo</div><div class="kpi-value" style="color:var(--loja-warning-text)">${baixo}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Estoque Crítico</div><div class="kpi-value" style="color:var(--loja-error-text)">${critico}</div></div>
       </div>
       <div class="card" style="padding:0">
         <div class="table-container">
