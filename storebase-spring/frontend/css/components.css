@@ -89,6 +89,22 @@
   white-space: nowrap;
 }
 
+.badge-success { background: #d4edda; color: #155724; }
+.badge-info    { background: #cce5ff; color: #004085; }
+.badge-teal    { background: #d1ecf1; color: #0c5460; }
+.badge-warning { background: #fff3cd; color: #856404; }
+.badge-danger  { background: #f8d7da; color: #721c24; }
+.badge-neutral { background: #e2e3e5; color: #383d41; }
+.badge-purple  { background: #e8d5f5; color: #6f42c1; }
+
+[data-theme="dark"] .badge-success { background: rgba(40,167,69,0.16);  color: var(--loja-success-text); }
+[data-theme="dark"] .badge-info    { background: rgba(59,130,196,0.18); color: var(--loja-primary-text); }
+[data-theme="dark"] .badge-teal    { background: rgba(23,162,184,0.18); color: #6cc9dc; }
+[data-theme="dark"] .badge-warning { background: rgba(255,193,7,0.18);  color: var(--loja-warning-text); }
+[data-theme="dark"] .badge-danger  { background: rgba(220,53,69,0.16);  color: var(--loja-error-text); }
+[data-theme="dark"] .badge-neutral { background: rgba(255,255,255,0.08); color: var(--loja-text-muted); }
+[data-theme="dark"] .badge-purple  { background: rgba(155,89,214,0.2);  color: #c79dfa; }
+
 
 .stock-badge {
   padding: 3px 9px;
@@ -100,6 +116,11 @@
 .stock-low  { background: #fff3cd; color: #856404; }
 .stock-warn { background: #f8d7da; color: #721c24; }
 .stock-crit { background: #f5c6cb; color: #721c24; }
+
+[data-theme="dark"] .stock-ok   { background: rgba(40,167,69,0.16);  color: var(--loja-success-text); }
+[data-theme="dark"] .stock-low  { background: rgba(255,193,7,0.18);  color: var(--loja-warning-text); }
+[data-theme="dark"] .stock-warn { background: rgba(220,53,69,0.16);  color: var(--loja-error-text); }
+[data-theme="dark"] .stock-crit { background: rgba(220,53,69,0.24);  color: var(--loja-error-text); }
 
 
 .form-group {
@@ -373,6 +394,12 @@ dialog::backdrop {
 .alert-critico { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
 .alert-baixo   { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; }
 .alert-info    { background: #cce5ff; border: 1px solid #b8daff; color: #004085; }
+.alert-ok      { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+
+[data-theme="dark"] .alert-critico { background: rgba(220,53,69,0.14); border-color: rgba(220,53,69,0.35); color: var(--loja-error-text); }
+[data-theme="dark"] .alert-baixo   { background: rgba(255,193,7,0.14); border-color: rgba(255,193,7,0.35); color: var(--loja-warning-text); }
+[data-theme="dark"] .alert-info    { background: rgba(59,130,196,0.14); border-color: rgba(59,130,196,0.35); color: var(--loja-primary-text); }
+[data-theme="dark"] .alert-ok      { background: rgba(40,167,69,0.14); border-color: rgba(40,167,69,0.35); color: var(--loja-success-text); }
 
 .filter-bar {
   display: flex;

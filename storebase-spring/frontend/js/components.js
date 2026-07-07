@@ -44,24 +44,24 @@ function renderSidebar() {
 
 
 const BADGE_CONFIG = {
-  OK:              { label:'OK',             bg:'#d4edda', color:'#155724' },
-  BAIXO:           { label:'Baixo',          bg:'#fff3cd', color:'#856404' },
-  CRITICO:         { label:'Crítico',        bg:'#f8d7da', color:'#721c24' },
-  ABERTO:          { label:'Aberto',         bg:'#cce5ff', color:'#004085' },
-  FECHADO:         { label:'Fechado',        bg:'#e2e3e5', color:'#383d41' },
-  ADMINISTRADOR:   { label:'Administrador',  bg:'#e8d5f5', color:'#6f42c1' },
-  VENDEDOR:        { label:'Vendedor',       bg:'#cce5ff', color:'#004085' },
-  GERENTE_ESTOQUE: { label:'Ger. Estoque',   bg:'#d4edda', color:'#155724' },
-  PIX:             { label:'PIX',            bg:'#d4edda', color:'#155724' },
-  DINHEIRO:        { label:'Dinheiro',       bg:'#d4edda', color:'#155724' },
-  CARTAO_CREDITO:  { label:'Cartão Crédito', bg:'#cce5ff', color:'#004085' },
-  CARTAO_DEBITO:   { label:'Cartão Débito',  bg:'#d1ecf1', color:'#0c5460' },
-  BOLETO:          { label:'Boleto',         bg:'#fff3cd', color:'#856404' },
+  OK:              { label:'OK',             cls:'badge-success' },
+  BAIXO:           { label:'Baixo',          cls:'badge-warning' },
+  CRITICO:         { label:'Crítico',        cls:'badge-danger' },
+  ABERTO:          { label:'Aberto',         cls:'badge-info' },
+  FECHADO:         { label:'Fechado',        cls:'badge-neutral' },
+  ADMINISTRADOR:   { label:'Administrador',  cls:'badge-purple' },
+  VENDEDOR:        { label:'Vendedor',       cls:'badge-info' },
+  GERENTE_ESTOQUE: { label:'Ger. Estoque',   cls:'badge-success' },
+  PIX:             { label:'PIX',            cls:'badge-success' },
+  DINHEIRO:        { label:'Dinheiro',       cls:'badge-success' },
+  CARTAO_CREDITO:  { label:'Cartão Crédito', cls:'badge-info' },
+  CARTAO_DEBITO:   { label:'Cartão Débito',  cls:'badge-teal' },
+  BOLETO:          { label:'Boleto',         cls:'badge-warning' },
 };
 
 function badgeHTML(status) {
-  const c = BADGE_CONFIG[status] ?? { label: status, bg:'#e2e3e5', color:'#383d41' };
-  return `<span class="badge" style="background:${c.bg};color:${c.color}">${escHtml(c.label)}</span>`;
+  const c = BADGE_CONFIG[status] ?? { label: status, cls:'badge-neutral' };
+  return `<span class="badge ${c.cls}">${escHtml(c.label)}</span>`;
 }
 
 

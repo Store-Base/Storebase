@@ -340,7 +340,7 @@ Pages.dashboard = {
     }
     if (!html) {
       html = `
-        <div class="alert-banner" style="background:#d4edda;border:1px solid #c3e6cb;color:#155724">
+        <div class="alert-banner alert-ok">
           <i data-lucide="check-circle"></i>
           <strong>Todos os produtos estão com estoque em nível adequado.</strong>
         </div>
