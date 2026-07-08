@@ -57,7 +57,7 @@ Pages.dashboard = {
       `;
 
       this._renderStatsAdmin(stats);
-      this._renderGrafico('chart-vendas-semana', grafico, '#1E3A5F');
+      this._renderGrafico('chart-vendas-semana', grafico, chartThemeOptions().primary);
       this._renderUltimasVendas(ultimasVendas);
       this._renderAcoesAdmin();
       lucide.createIcons();
@@ -421,6 +421,7 @@ Pages.dashboard = {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     if (this._charts[canvasId]) { this._charts[canvasId].destroy(); }
+    const theme = chartThemeOptions();
     this._charts[canvasId] = new Chart(canvas, {
       type: 'line',
       data: {
@@ -440,8 +441,8 @@ Pages.dashboard = {
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
-          y: { ticks: { callback: v => 'R$' + (v / 1000).toFixed(1) + 'k' } },
-          x: { ticks: { font: { size: 11 } } }
+          y: { ticks: { color: theme.muted, callback: v => 'R$' + (v / 1000).toFixed(1) + 'k' }, grid: { color: theme.grid } },
+          x: { ticks: { color: theme.muted, font: { size: 11 } }, grid: { color: theme.grid } }
         }
       }
     });

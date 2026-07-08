@@ -67,6 +67,17 @@ function applyCPFMask(input) {
 }
 
 
+function chartThemeOptions() {
+  const css = getComputedStyle(document.documentElement);
+  return {
+    text:    css.getPropertyValue('--loja-text').trim(),
+    muted:   css.getPropertyValue('--loja-text-muted').trim(),
+    grid:    css.getPropertyValue('--loja-card-border').trim(),
+    primary: css.getPropertyValue('--loja-primary-text').trim(),
+  };
+}
+
+
 function escHtml(str) {
   if (!str) return '';
   return String(str)

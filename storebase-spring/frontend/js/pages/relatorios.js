@@ -167,13 +167,22 @@ Pages.relatorios = {
     `;
     const canvas = document.getElementById('chart-mais-vendidos');
     if (canvas && produtos.length) {
+      const theme = chartThemeOptions();
       this._charts.maisVendidos = new Chart(canvas, {
         type: 'bar',
         data: {
           labels: produtos.map(p => p.produto),
-          datasets: [{ label: 'Quantidade Vendida', data: produtos.map(p => p.quantidadeVendida), backgroundColor: '#1E3A5F' }],
+          datasets: [{ label: 'Quantidade Vendida', data: produtos.map(p => p.quantidadeVendida), backgroundColor: theme.primary }],
         },
-        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } } },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: theme.muted }, grid: { color: theme.grid } },
+            y: { ticks: { color: theme.muted }, grid: { color: theme.grid } },
+          },
+        },
       });
     }
   },
@@ -254,6 +263,7 @@ Pages.relatorios = {
     `;
     const canvas = document.getElementById('chart-faturamento');
     if (canvas) {
+      const theme = chartThemeOptions();
       this._charts.faturamento = new Chart(canvas, {
         type: 'line',
         data: {
@@ -265,8 +275,11 @@ Pages.relatorios = {
         },
         options: {
           responsive:true,
-          plugins:{ legend:{ position:'top' } },
-          scales: { y:{ ticks:{ callback: v => 'R$' + (v/1000).toFixed(0)+'k' } } },
+          plugins:{ legend:{ position:'top', labels:{ color: theme.text } } },
+          scales: {
+            y: { ticks:{ color: theme.muted, callback: v => 'R$' + (v/1000).toFixed(0)+'k' }, grid:{ color: theme.grid } },
+            x: { ticks:{ color: theme.muted }, grid:{ color: theme.grid } },
+          },
         },
       });
     }

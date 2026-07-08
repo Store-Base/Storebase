@@ -35,6 +35,9 @@ const App = {
     document.documentElement.setAttribute('data-theme', novo);
     localStorage.setItem('loja_tema', novo);
     renderSidebar();
+    if (['dashboard', 'relatorios'].includes(this.page)) {
+      Router.navigate(this.page);
+    }
   },
 
   login(userData) {
