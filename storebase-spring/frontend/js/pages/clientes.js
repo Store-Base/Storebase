@@ -122,6 +122,10 @@ Pages.clientes = {
             <label>Endereço</label>
             <input class="input" id="cli-end" type="text" value="${escHtml(c?.endereco || '')}" placeholder="Rua, número - Bairro">
           </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Observações</label>
+            <textarea class="input" id="cli-obs" rows="3" placeholder="Preferências, combinados, anotações gerais...">${escHtml(c?.observacoes || '')}</textarea>
+          </div>
         </div>
       `,
       footerHTML: `
@@ -137,17 +141,18 @@ Pages.clientes = {
   },
 
   async _save() {
-    const nome     = formValue('cli-nome');
-    const cpf      = formValue('cli-cpf');
-    const email    = formValue('cli-email');
-    const endereco = formValue('cli-end');
-    const telefone = formValue('cli-tel');
+    const nome        = formValue('cli-nome');
+    const cpf         = formValue('cli-cpf');
+    const email       = formValue('cli-email');
+    const endereco    = formValue('cli-end');
+    const telefone    = formValue('cli-tel');
+    const observacoes = formValue('cli-obs');
 
     if (!nome || !cpf) { showToast('Nome e CPF são obrigatórios.', 'warning'); return; }
 
     App.setLoading(true);
     try {
-      const body = { nome, cpf, email, endereco, telefone };
+      const body = { nome, cpf, email, endereco, telefone, observacoes };
       if (App.editingId) {
         await apiFetch(`/clientes/${App.editingId}`, { method:'PUT', body: JSON.stringify(body) });
         showToast('Cliente atualizado com sucesso!', 'success');
