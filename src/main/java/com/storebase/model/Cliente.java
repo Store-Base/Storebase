@@ -48,6 +48,10 @@ public class Cliente {
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
 
+    private String observacoes;
+    public String getObservacoes() { return observacoes; }
+    public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+
     @Override
     public String toString() {
         return "Cliente{id=" + id + ", nome='" + nome + "', cpf='" + cpf
