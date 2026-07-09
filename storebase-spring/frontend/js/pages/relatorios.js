@@ -253,7 +253,7 @@ Pages.relatorios = {
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Receita Líquida Total (${this._filtros.ano})</div>
-          <div class="kpi-value" style="color:var(--loja-success)">${fmt(totalLiquido)}</div>
+          <div class="kpi-value" style="color:var(--loja-success-text)">${fmt(totalLiquido)}</div>
         </div>
       </div>
       <div class="card">
@@ -269,8 +269,8 @@ Pages.relatorios = {
         data: {
           labels: faturamento.map(f => f.mes),
           datasets: [
-            { label:'Receita Bruta',   data: faturamento.map(f => f.receitaBruta),   borderColor:'#28A745', backgroundColor:'rgba(40,167,69,0.06)', tension:0.3, fill:true },
-            { label:'Receita Líquida', data: faturamento.map(f => f.receitaLiquida), borderColor:'#1E3A5F', backgroundColor:'rgba(30,58,95,0.06)',  tension:0.3, fill:true },
+            { label:'Receita Bruta',   data: faturamento.map(f => f.receitaBruta),   borderColor: theme.success, backgroundColor: theme.success + '14', tension:0.3, fill:true },
+            { label:'Receita Líquida', data: faturamento.map(f => f.receitaLiquida), borderColor: theme.primary, backgroundColor: theme.primary + '14', tension:0.3, fill:true },
           ],
         },
         options: {

@@ -207,7 +207,7 @@
 .cart-item-remove {
   background: transparent;
   border: none;
-  color: var(--loja-error);
+  color: var(--loja-error-text);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -317,6 +317,21 @@
 .kpi-value.primary { color: var(--loja-primary-text); }
 
 @media print {
+  /* Impressão sempre em paleta clara, mesmo com o tema escuro ativo na tela */
+  [data-theme="dark"] {
+    --loja-bg: #f0f2f5;
+    --loja-white: #ffffff;
+    --loja-card: #F4F6F9;
+    --loja-card-border: #e2e6ea;
+    --loja-border: #dee2e6;
+    --loja-text: #1a1a1a;
+    --loja-text-muted: #6c757d;
+    --loja-inset: #f8f9fa;
+    --loja-primary-text: #1E3A5F;
+    --loja-success-text: #28A745;
+    --loja-error-text: #DC3545;
+    --loja-warning-text: #fd7e14;
+  }
   #sidebar, #header, .tab-bar, .filter-bar,
   .btn-primary, .btn-outline-primary, .btn-green,
   .btn-orange, .btn-teal, .btn-outline, .page-topbar { display: none !important; }

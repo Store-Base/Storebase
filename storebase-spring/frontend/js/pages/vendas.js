@@ -78,7 +78,7 @@ Pages.vendas = {
         </div>
         <div class="card">
           <div style="font-size:13px;color:var(--loja-text-muted);margin-bottom:6px">Receita no Período</div>
-          <div style="font-size:28px;font-weight:700;color:var(--loja-primary)">${fmt(receitaPeriodo)}</div>
+          <div style="font-size:28px;font-weight:700;color:var(--loja-primary-text)">${fmt(receitaPeriodo)}</div>
         </div>
       </div>
     `;
@@ -159,7 +159,7 @@ Pages.vendas = {
           </table>
           <div style="text-align:right;margin-top:12px">
             ${v.desconto > 0 ? `<div style="color:var(--loja-text-muted);font-size:13px">Desconto: -${fmt(v.desconto)}</div>` : ''}
-            <div style="font-size:18px;font-weight:700;color:var(--loja-primary)">Total: ${fmt(v.total)}</div>
+            <div style="font-size:18px;font-weight:700;color:var(--loja-primary-text)">Total: ${fmt(v.total)}</div>
             ${v.parcelas > 1 ? `<div style="color:var(--loja-text-muted);font-size:13px;margin-top:2px">${v.parcelas}x de ${fmt(v.valorParcela)}${v.taxaJuros > 0 ? ` · juros ${v.taxaJuros}% por parcela` : ''}</div>` : ''}
           </div>
         `,

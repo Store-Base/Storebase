@@ -92,7 +92,7 @@ Pages['nova-venda'] = {
       <div class="form-group" style="margin-bottom:14px">
         <label>Buscar Cliente</label>
         <div style="position:relative">
-          <i data-lucide="search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:#adb5bd"></i>
+          <i data-lucide="search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--loja-text-muted)"></i>
           <input class="input" id="cli-busca" type="text" style="padding-left:34px"
             placeholder="Nome, CPF ou email..."
             value="${this._venda.cliente && !this._venda.avulso ? this._venda.cliente.nome : ''}">
@@ -256,14 +256,14 @@ Pages['nova-venda'] = {
       <div class="form-group" style="margin-bottom:14px">
         <label>Buscar Produto</label>
         <div style="position:relative">
-          <i data-lucide="search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:#adb5bd"></i>
+          <i data-lucide="search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--loja-text-muted)"></i>
           <input class="input" id="prod-busca-venda" type="text" style="padding-left:34px" placeholder="Nome, código ou categoria...">
         </div>
       </div>
       <div id="prod-resultados-venda" style="margin-bottom:14px"></div>
       <div style="margin:16px 0 8px;font-weight:600;font-size:13px">Carrinho</div>
       <div id="carrinho-items">${itensHTML}</div>
-      ${this._venda.itens.length ? `<div style="text-align:right;margin-top:8px;font-size:14px;color:var(--loja-text-muted)">Subtotal: <strong style="color:var(--loja-primary)">${fmt(subtotal)}</strong></div>` : ''}
+      ${this._venda.itens.length ? `<div style="text-align:right;margin-top:8px;font-size:14px;color:var(--loja-text-muted)">Subtotal: <strong style="color:var(--loja-primary-text)">${fmt(subtotal)}</strong></div>` : ''}
       <div style="display:flex;justify-content:space-between;margin-top:20px">
         <button class="btn btn-outline" onclick="Pages['nova-venda']._prevStep()">
           <i data-lucide="chevron-left"></i> Voltar
@@ -437,7 +437,7 @@ Pages['nova-venda'] = {
 
     return `
       <div style="text-align:center;margin-bottom:20px">
-        <i data-lucide="check-circle" style="width:48px;height:48px;color:var(--loja-success)"></i>
+        <i data-lucide="check-circle" style="width:48px;height:48px;color:var(--loja-success-text)"></i>
         <h3 style="font-size:16px;font-weight:700;margin-top:8px">Confirmar Venda</h3>
       </div>
       <div class="confirmation-box">

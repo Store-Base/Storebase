@@ -81,8 +81,8 @@ Pages.orcamentos = {
         <button onclick="Pages.orcamentos._openForm(${orc.id})" title="Editar">
           <i data-lucide="pencil" style="color:var(--loja-text-muted)"></i>
         </button>
-        <button onclick="Pages.orcamentos._converter(${orc.id})" title="Converter em Venda" style="color:#28a745">
-          <i data-lucide="circle-plus" style="color:#28a745"></i>
+        <button onclick="Pages.orcamentos._converter(${orc.id})" title="Converter em Venda" style="color:var(--loja-success-text)">
+          <i data-lucide="circle-plus" style="color:var(--loja-success-text)"></i>
         </button>
         <button onclick="Pages.orcamentos._delete(${orc.id})" title="Excluir">
           <i data-lucide="trash-2" style="color:var(--loja-error-text)"></i>
@@ -149,7 +149,7 @@ Pages.orcamentos = {
             <i data-lucide="plus"></i> Add
           </button>
         </div>
-        <div id="orc-total-line" style="text-align:right;font-weight:700;font-size:15px;color:var(--loja-primary)"></div>
+        <div id="orc-total-line" style="text-align:right;font-weight:700;font-size:15px;color:var(--loja-primary-text)"></div>
       `,
       footerHTML: `
         <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>

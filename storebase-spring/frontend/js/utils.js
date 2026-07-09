@@ -74,6 +74,7 @@ function chartThemeOptions() {
     muted:   css.getPropertyValue('--loja-text-muted').trim(),
     grid:    css.getPropertyValue('--loja-card-border').trim(),
     primary: css.getPropertyValue('--loja-primary-text').trim(),
+    success: css.getPropertyValue('--loja-success-text').trim(),
   };
 }
 
