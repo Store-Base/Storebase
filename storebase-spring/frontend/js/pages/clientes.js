@@ -67,13 +67,13 @@ Pages.clientes = {
               <td>
                 <div class="actions-cell">
                   <button onclick="Pages.clientes._verHistorico(${c.id},'${escHtml(c.nome)}')" title="Histórico de compras">
-                    <i data-lucide="clock" style="color:#6c757d"></i>
+                    <i data-lucide="clock" style="color:var(--loja-text-muted)"></i>
                   </button>
                   <button onclick="Pages.clientes._openForm(${c.id})" title="Editar">
-                    <i data-lucide="pencil" style="color:#6c757d"></i>
+                    <i data-lucide="pencil" style="color:var(--loja-text-muted)"></i>
                   </button>
                   <button onclick="Pages.clientes._delete(${c.id},'${escHtml(c.nome)}')" title="Excluir">
-                    <i data-lucide="trash-2" style="color:#dc3545"></i>
+                    <i data-lucide="trash-2" style="color:var(--loja-error-text)"></i>
                   </button>
                 </div>
               </td>

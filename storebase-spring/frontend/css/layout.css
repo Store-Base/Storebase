@@ -29,7 +29,7 @@
 #sidebar {
   width: var(--sidebar-width);
   min-width: var(--sidebar-width);
-  background: var(--loja-primary);
+  background: var(--loja-sidebar);
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -43,7 +43,7 @@
   gap: 10px;
   padding: 20px 20px 20px;
   border-bottom: 1px solid rgba(255,255,255,0.12);
-  color: var(--loja-white);
+  color: var(--loja-on-primary);
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -85,14 +85,14 @@
 }
 
 .nav-item:hover {
-  color: var(--loja-white);
+  color: var(--loja-on-primary);
   background: rgba(255,255,255,0.08);
 }
 
 .nav-item.active {
-  color: var(--loja-white);
+  color: var(--loja-on-primary);
   background: rgba(255,255,255,0.15);
-  border-left-color: var(--loja-white);
+  border-left-color: var(--loja-on-primary);
   font-weight: 600;
 }
 
@@ -112,7 +112,7 @@
 .sidebar-user-name {
   font-size: 14px;
   font-weight: 600;
-  color: var(--loja-white);
+  color: var(--loja-on-primary);
   margin-bottom: 10px;
 }
 
@@ -201,4 +201,24 @@ section[id^="page-"] {
   #sidebar { width: 200px; min-width: 200px; }
   :root { --sidebar-width: 200px; }
   #main-content { padding: 20px 16px; }
+}
+
+[data-theme="dark"] #global-spinner {
+  background: rgba(15, 18, 24, 0.8);
+}
+
+[data-theme="dark"] #header {
+  background: var(--loja-card);
+  border-bottom-color: var(--loja-card-border);
+  box-shadow: 0 1px 0 var(--loja-card-border), 0 2px 8px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] #main-content {
+  background: var(--loja-bg);
+}
+
+.nav-separator {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  margin: 8px 12px;
 }

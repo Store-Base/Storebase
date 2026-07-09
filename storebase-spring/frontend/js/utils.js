@@ -24,7 +24,7 @@ function fmtDataHora(iso) {
   const d = new Date(iso);
   const data = d.toLocaleDateString('pt-BR');
   const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  return `<div style="font-weight:600">${data}</div><div style="font-size:12px;color:#888">${hora}</div>`;
+  return `<div style="font-weight:600">${data}</div><div style="font-size:12px;color:var(--loja-text-muted)">${hora}</div>`;
 }
 
 function maskCPF(value) {
@@ -64,6 +64,18 @@ function applyCPFMask(input) {
   input.addEventListener('input', () => {
     input.value = maskCPF(input.value);
   });
+}
+
+
+function chartThemeOptions() {
+  const css = getComputedStyle(document.documentElement);
+  return {
+    text:    css.getPropertyValue('--loja-text').trim(),
+    muted:   css.getPropertyValue('--loja-text-muted').trim(),
+    grid:    css.getPropertyValue('--loja-card-border').trim(),
+    primary: css.getPropertyValue('--loja-primary-text').trim(),
+    success: css.getPropertyValue('--loja-success-text').trim(),
+  };
 }
 
 

@@ -75,10 +75,10 @@ Pages.estoque = {
               <td><span class="text-mono">${escHtml(item.codigo)}</span></td>
               <td>${escHtml(item.categoria)}</td>
               <td>
-                <span style="font-weight:600;color:${item.status === 'OK' ? '#155724' : item.status === 'BAIXO' ? '#856404' : '#721c24'}">
+                <span style="font-weight:600;color:${item.status === 'OK' ? 'var(--loja-success-text)' : item.status === 'BAIXO' ? 'var(--loja-warning-text)' : 'var(--loja-error-text)'}">
                   ${item.quantidade}
                 </span>
-                <span style="color:#888;font-size:12px"> un.</span>
+                <span style="color:var(--loja-text-muted);font-size:12px"> un.</span>
               </td>
               <td>${badgeHTML(item.status)}</td>
               <td>
@@ -103,7 +103,7 @@ Pages.estoque = {
       title: 'Entrada de Estoque',
       width: 420,
       contentHTML: `
-        <p style="margin-bottom:14px;color:#555">Produto: <strong>${escHtml(nomeProduto)}</strong></p>
+        <p style="margin-bottom:14px;color:var(--loja-text-muted)">Produto: <strong>${escHtml(nomeProduto)}</strong></p>
         <div class="form-group">
           <label>Quantidade a Adicionar *</label>
           <input class="input" id="estoque-qtd" type="number" min="1" placeholder="Ex: 10">
@@ -143,8 +143,8 @@ Pages.estoque = {
       title: 'Ajuste de Estoque',
       width: 420,
       contentHTML: `
-        <p style="margin-bottom:14px;color:#555">Produto: <strong>${escHtml(nomeProduto)}</strong></p>
-        <p style="margin-bottom:14px;font-size:13px;color:#888">Quantidade atual: <strong>${quantidadeAtual} un.</strong></p>
+        <p style="margin-bottom:14px;color:var(--loja-text-muted)">Produto: <strong>${escHtml(nomeProduto)}</strong></p>
+        <p style="margin-bottom:14px;font-size:13px;color:var(--loja-text-muted)">Quantidade atual: <strong>${quantidadeAtual} un.</strong></p>
         <div class="form-group">
           <label>Nova Quantidade *</label>
           <input class="input" id="estoque-nova-qtd" type="number" min="0" value="${quantidadeAtual}">

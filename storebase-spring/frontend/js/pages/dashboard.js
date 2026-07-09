@@ -57,7 +57,7 @@ Pages.dashboard = {
       `;
 
       this._renderStatsAdmin(stats);
-      this._renderGrafico('chart-vendas-semana', grafico, '#1E3A5F');
+      this._renderGrafico('chart-vendas-semana', grafico, chartThemeOptions().primary);
       this._renderUltimasVendas(ultimasVendas);
       this._renderAcoesAdmin();
       lucide.createIcons();
@@ -72,7 +72,7 @@ Pages.dashboard = {
     document.getElementById('dash-stats').innerHTML = `
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(30,58,95,0.1)">
-          <i data-lucide="shopping-cart" style="color:var(--loja-primary)"></i>
+          <i data-lucide="shopping-cart" style="color:var(--loja-primary-text)"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Vendas Hoje</div>
@@ -92,17 +92,17 @@ Pages.dashboard = {
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(220,53,69,0.1)">
-          <i data-lucide="alert-triangle" style="color:${stats.alertasEstoque > 0 ? '#dc3545' : '#aaa'}"></i>
+          <i data-lucide="alert-triangle" style="color:${stats.alertasEstoque > 0 ? 'var(--loja-error-text)' : 'var(--loja-text-muted)'}"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Alertas de Estoque</div>
-          <div class="stat-value" style="color:${stats.alertasEstoque > 0 ? '#dc3545' : 'inherit'}">${stats.alertasEstoque}</div>
+          <div class="stat-value" style="color:${stats.alertasEstoque > 0 ? 'var(--loja-error-text)' : 'inherit'}">${stats.alertasEstoque}</div>
           <div class="stat-sub">${stats.alertasCriticos} crítico(s) · ${stats.alertasBaixos} baixo(s)</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(253,126,20,0.1)">
-          <i data-lucide="file-text" style="color:#fd7e14"></i>
+          <i data-lucide="file-text" style="color:var(--loja-warning-text)"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Orçamentos Abertos</div>
@@ -174,7 +174,7 @@ Pages.dashboard = {
       `;
 
       this._renderStatsVendedor(stats);
-      this._renderGrafico('chart-vendas-semana', grafico, '#28a745');
+      this._renderGrafico('chart-vendas-semana', grafico, chartThemeOptions().success);
       this._renderUltimasVendas(minhasVendas);
       lucide.createIcons();
     } catch (err) {
@@ -188,7 +188,7 @@ Pages.dashboard = {
     document.getElementById('dash-stats').innerHTML = `
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(40,167,69,0.1)">
-          <i data-lucide="shopping-cart" style="color:#28a745"></i>
+          <i data-lucide="shopping-cart" style="color:var(--loja-success-text)"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Minhas Vendas Hoje</div>
@@ -208,7 +208,7 @@ Pages.dashboard = {
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(253,126,20,0.1)">
-          <i data-lucide="file-text" style="color:#fd7e14"></i>
+          <i data-lucide="file-text" style="color:var(--loja-warning-text)"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Orçamentos Abertos</div>
@@ -280,27 +280,27 @@ Pages.dashboard = {
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(220,53,69,0.1)">
-          <i data-lucide="alert-triangle" style="color:${stats.produtosCriticos > 0 ? '#dc3545' : '#aaa'}"></i>
+          <i data-lucide="alert-triangle" style="color:${stats.produtosCriticos > 0 ? 'var(--loja-error-text)' : 'var(--loja-text-muted)'}"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Estoque Crítico</div>
-          <div class="stat-value" style="color:${stats.produtosCriticos > 0 ? '#dc3545' : 'inherit'}">${stats.produtosCriticos}</div>
+          <div class="stat-value" style="color:${stats.produtosCriticos > 0 ? 'var(--loja-error-text)' : 'inherit'}">${stats.produtosCriticos}</div>
           <div class="stat-sub">produto(s) abaixo de 5 un.</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(255,193,7,0.15)">
-          <i data-lucide="alert-circle" style="color:#856404"></i>
+          <i data-lucide="alert-circle" style="color:var(--loja-warning-text)"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Estoque Baixo</div>
-          <div class="stat-value" style="color:${stats.produtosBaixos > 0 ? '#856404' : 'inherit'}">${stats.produtosBaixos}</div>
+          <div class="stat-value" style="color:${stats.produtosBaixos > 0 ? 'var(--loja-warning-text)' : 'inherit'}">${stats.produtosBaixos}</div>
           <div class="stat-sub">produto(s) entre 5 e 9 un.</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background:rgba(40,167,69,0.1)">
-          <i data-lucide="dollar-sign" style="color:#28a745"></i>
+          <i data-lucide="dollar-sign" style="color:var(--loja-success-text)"></i>
         </div>
         <div class="stat-info">
           <div class="stat-label">Valor em Estoque</div>
@@ -340,7 +340,7 @@ Pages.dashboard = {
     }
     if (!html) {
       html = `
-        <div class="alert-banner" style="background:#d4edda;border:1px solid #c3e6cb;color:#155724">
+        <div class="alert-banner alert-ok">
           <i data-lucide="check-circle"></i>
           <strong>Todos os produtos estão com estoque em nível adequado.</strong>
         </div>
@@ -372,7 +372,7 @@ Pages.dashboard = {
             <tr>
               <td class="text-bold">${escHtml(a.nomeProduto)}</td>
               <td><span class="text-mono">${escHtml(a.codigo)}</span></td>
-              <td><span style="font-weight:700;color:${a.status === 'CRITICO' ? '#dc3545' : '#856404'}">${a.quantidade} un.</span></td>
+              <td><span style="font-weight:700;color:${a.status === 'CRITICO' ? 'var(--loja-error-text)' : 'var(--loja-warning-text)'}">${a.quantidade} un.</span></td>
               <td>${badgeHTML(a.status)}</td>
               <td>
                 <button class="btn-stock-entrada" onclick="Router.navigate('estoque')">
@@ -421,6 +421,7 @@ Pages.dashboard = {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     if (this._charts[canvasId]) { this._charts[canvasId].destroy(); }
+    const theme = chartThemeOptions();
     this._charts[canvasId] = new Chart(canvas, {
       type: 'line',
       data: {
@@ -440,8 +441,8 @@ Pages.dashboard = {
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
-          y: { ticks: { callback: v => 'R$' + (v / 1000).toFixed(1) + 'k' } },
-          x: { ticks: { font: { size: 11 } } }
+          y: { ticks: { color: theme.muted, callback: v => 'R$' + (v / 1000).toFixed(1) + 'k' }, grid: { color: theme.grid } },
+          x: { ticks: { color: theme.muted, font: { size: 11 } }, grid: { color: theme.grid } }
         }
       }
     });
