@@ -13,6 +13,7 @@ Pages['nova-venda'] = {
       formaPagamento: 'PIX',
       parcelas: 1,
       juros: 0,
+      observacoes: '',
     };
     this._render();
   },
@@ -212,6 +213,15 @@ Pages['nova-venda'] = {
         jurosInput.oninput = () => {
           this._venda.juros = parseFloat(jurosInput.value) || 0;
           this._updateTotaisDisplay();
+        };
+      }
+    }
+
+    if (this._venda.step === 3) {
+      const obsInput = document.getElementById('venda-obs');
+      if (obsInput) {
+        obsInput.oninput = () => {
+          this._venda.observacoes = obsInput.value;
         };
       }
     }
@@ -469,6 +479,10 @@ Pages['nova-venda'] = {
         </div>
         ${parcelas > 1 ? `<div class="confirmation-row"><span>Parcelamento</span><span>${parcelas}x de ${fmt(valorParcela)}</span></div>` : ''}
       </div>
+      <div class="form-group" style="margin-top:16px">
+        <label>Observações (opcional)</label>
+        <textarea class="input" id="venda-obs" rows="2" placeholder="Ex: embrulhar para presente">${escHtml(this._venda.observacoes || '')}</textarea>
+      </div>
       <div style="display:flex;justify-content:space-between;margin-top:20px;gap:10px">
         <button class="btn btn-outline" onclick="Pages['nova-venda']._prevStep()">
           <i data-lucide="chevron-left"></i> Voltar
@@ -515,6 +529,7 @@ Pages['nova-venda'] = {
           formaPagamento: this._venda.formaPagamento,
           parcelas,
           taxaJuros:      this._parcelavel() ? (this._venda.juros || 0) : 0,
+          observacoes:    this._venda.observacoes || '',
         }),
       });
       showToast('Venda finalizada com sucesso!', 'success');

@@ -86,6 +86,7 @@ public class VendaController {
         venda.setParcelas(parc != null ? ((Number) parc).intValue() : 1);
         Object taxa = body.get("taxaJuros");
         venda.setTaxaJuros(taxa != null ? ((Number) taxa).doubleValue() : 0);
+        venda.setObservacoes((String) body.get("observacoes"));
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> itensJson = (List<Map<String, Object>>) body.get("itens");

@@ -82,6 +82,7 @@ ALTER TABLE pedido ADD COLUMN IF NOT EXISTS forma_pagamento VARCHAR(50);
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS status VARCHAR(50);
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS parcelas INT NOT NULL DEFAULT 1;
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS taxa_juros DECIMAL(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE pedido ADD COLUMN IF NOT EXISTS observacoes TEXT;
 
 -- Usuários de demonstração (correspondem às credenciais exibidas na tela de login)
 INSERT INTO usuario (nome, cargo, login, senha, salario) VALUES

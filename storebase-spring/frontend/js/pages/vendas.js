@@ -157,6 +157,7 @@ Pages.vendas = {
               `).join('')}
             </tbody>
           </table>
+          ${v.observacoes ? `<div style="margin-top:12px;padding:10px;background:var(--loja-inset, #f8f9fa);border-radius:6px;font-size:13px"><strong>Observações:</strong> ${escHtml(v.observacoes)}</div>` : ''}
           <div style="text-align:right;margin-top:12px">
             ${v.desconto > 0 ? `<div style="color:#888;font-size:13px">Desconto: -${fmt(v.desconto)}</div>` : ''}
             <div style="font-size:18px;font-weight:700;color:var(--loja-primary)">Total: ${fmt(v.total)}</div>
