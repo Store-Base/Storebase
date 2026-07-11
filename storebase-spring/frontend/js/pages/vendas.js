@@ -73,12 +73,12 @@ Pages.vendas = {
     return `
       <div class="grid-2" style="margin-bottom:16px">
         <div class="card">
-          <div style="font-size:13px;color:#888;margin-bottom:6px">Total de Vendas</div>
-          <div style="font-size:28px;font-weight:700;color:#1a1a1a">${totalVendas}</div>
+          <div style="font-size:13px;color:var(--loja-text-muted);margin-bottom:6px">Total de Vendas</div>
+          <div style="font-size:28px;font-weight:700;color:var(--loja-text)">${totalVendas}</div>
         </div>
         <div class="card">
-          <div style="font-size:13px;color:#888;margin-bottom:6px">Receita no Período</div>
-          <div style="font-size:28px;font-weight:700;color:var(--loja-primary)">${fmt(receitaPeriodo)}</div>
+          <div style="font-size:13px;color:var(--loja-text-muted);margin-bottom:6px">Receita no Período</div>
+          <div style="font-size:28px;font-weight:700;color:var(--loja-primary-text)">${fmt(receitaPeriodo)}</div>
         </div>
       </div>
     `;
@@ -111,7 +111,7 @@ Pages.vendas = {
               <td>
                 <div class="actions-cell">
                   <button onclick="Pages.vendas._verDetalhe(${v.id})" title="Ver detalhes">
-                    <i data-lucide="eye" style="color:#6c757d"></i>
+                    <i data-lucide="eye" style="color:var(--loja-text-muted)"></i>
                   </button>
                 </div>
               </td>
@@ -159,9 +159,9 @@ Pages.vendas = {
           </table>
           ${v.observacoes ? `<div style="margin-top:12px;padding:10px;background:var(--loja-inset, #f8f9fa);border-radius:6px;font-size:13px"><strong>Observações:</strong> ${escHtml(v.observacoes)}</div>` : ''}
           <div style="text-align:right;margin-top:12px">
-            ${v.desconto > 0 ? `<div style="color:#888;font-size:13px">Desconto: -${fmt(v.desconto)}</div>` : ''}
-            <div style="font-size:18px;font-weight:700;color:var(--loja-primary)">Total: ${fmt(v.total)}</div>
-            ${v.parcelas > 1 ? `<div style="color:#888;font-size:13px;margin-top:2px">${v.parcelas}x de ${fmt(v.valorParcela)}${v.taxaJuros > 0 ? ` · juros ${v.taxaJuros}% por parcela` : ''}</div>` : ''}
+            ${v.desconto > 0 ? `<div style="color:var(--loja-text-muted);font-size:13px">Desconto: -${fmt(v.desconto)}</div>` : ''}
+            <div style="font-size:18px;font-weight:700;color:var(--loja-primary-text)">Total: ${fmt(v.total)}</div>
+            ${v.parcelas > 1 ? `<div style="color:var(--loja-text-muted);font-size:13px;margin-top:2px">${v.parcelas}x de ${fmt(v.valorParcela)}${v.taxaJuros > 0 ? ` · juros ${v.taxaJuros}% por parcela` : ''}</div>` : ''}
           </div>
         `,
         footerHTML: `<button class="btn btn-outline" onclick="closeModal()">Fechar</button>`,

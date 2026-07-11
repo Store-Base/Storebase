@@ -13,7 +13,7 @@ import java.util.Optional;
 public class ProdutoRepository {
 
     public void salvar(Produto produto) {
-        String sql = "INSERT INTO produto (nome, codigo, preco_venda, custo, categoria, quantidade_estoque) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO produto (nome, codigo, preco_venda, custo, categoria, quantidade_estoque, icms, ipi, pis, cofins, ncm, cfop, cst) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, produto.getNome());
@@ -22,6 +22,13 @@ public class ProdutoRepository {
             stmt.setDouble(4, produto.getCusto());
             stmt.setString(5, produto.getCategoria());
             stmt.setInt(6, produto.getQuantidadeEstoque());
+            stmt.setDouble(7, produto.getIcms());
+            stmt.setDouble(8, produto.getIpi());
+            stmt.setDouble(9, produto.getPis());
+            stmt.setDouble(10, produto.getCofins());
+            stmt.setString(11, produto.getNcm());
+            stmt.setString(12, produto.getCfop());
+            stmt.setString(13, produto.getCst());
             stmt.executeUpdate();
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) produto.setId(rs.getInt(1));
@@ -32,7 +39,7 @@ public class ProdutoRepository {
     }
 
     public void atualizar(Produto produto) {
-        String sql = "UPDATE produto SET nome=?, codigo=?, preco_venda=?, custo=?, categoria=?, quantidade_estoque=? WHERE id=?";
+        String sql = "UPDATE produto SET nome=?, codigo=?, preco_venda=?, custo=?, categoria=?, quantidade_estoque=?, icms=?, ipi=?, pis=?, cofins=?, ncm=?, cfop=?, cst=? WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, produto.getNome());
@@ -41,7 +48,14 @@ public class ProdutoRepository {
             stmt.setDouble(4, produto.getCusto());
             stmt.setString(5, produto.getCategoria());
             stmt.setInt(6, produto.getQuantidadeEstoque());
-            stmt.setInt(7, produto.getId());
+            stmt.setDouble(7, produto.getIcms());
+            stmt.setDouble(8, produto.getIpi());
+            stmt.setDouble(9, produto.getPis());
+            stmt.setDouble(10, produto.getCofins());
+            stmt.setString(11, produto.getNcm());
+            stmt.setString(12, produto.getCfop());
+            stmt.setString(13, produto.getCst());
+            stmt.setInt(14, produto.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar produto: " + e.getMessage());
@@ -139,6 +153,13 @@ public class ProdutoRepository {
         p.setCusto(rs.getDouble("custo"));
         p.setCategoria(rs.getString("categoria"));
         p.setQuantidadeEstoque(rs.getInt("quantidade_estoque"));
+        p.setIcms(rs.getDouble("icms"));
+        p.setIpi(rs.getDouble("ipi"));
+        p.setPis(rs.getDouble("pis"));
+        p.setCofins(rs.getDouble("cofins"));
+        p.setNcm(rs.getString("ncm"));
+        p.setCfop(rs.getString("cfop"));
+        p.setCst(rs.getString("cst"));
         return p;
     }
 }

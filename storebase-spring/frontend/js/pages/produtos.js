@@ -76,10 +76,10 @@ Pages.produtos = {
               <td>
                 <div class="actions-cell">
                   <button onclick="Pages.produtos._openForm(${p.id})" title="Editar">
-                    <i data-lucide="pencil" style="color:#6c757d"></i>
+                    <i data-lucide="pencil" style="color:var(--loja-text-muted)"></i>
                   </button>
                   <button onclick="Pages.produtos._delete(${p.id},'${escHtml(p.nome)}')" title="Excluir">
-                    <i data-lucide="trash-2" style="color:#dc3545"></i>
+                    <i data-lucide="trash-2" style="color:var(--loja-error-text)"></i>
                   </button>
                 </div>
               </td>
@@ -132,6 +132,37 @@ Pages.produtos = {
             <label>Quantidade em Estoque</label>
             <input class="input" id="prod-qtd" type="number" min="0" value="${p?.quantidadeEstoque ?? 0}">
           </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <div style="font-weight:600;font-size:13px;margin:8px 0 4px;color:var(--loja-text-muted)">Impostos (informativo)</div>
+          </div>
+          <div class="form-group">
+            <label>ICMS (%)</label>
+            <input class="input" id="prod-icms" type="number" step="0.01" min="0" value="${p?.icms || ''}">
+          </div>
+          <div class="form-group">
+            <label>IPI (%)</label>
+            <input class="input" id="prod-ipi" type="number" step="0.01" min="0" value="${p?.ipi || ''}">
+          </div>
+          <div class="form-group">
+            <label>PIS (%)</label>
+            <input class="input" id="prod-pis" type="number" step="0.01" min="0" value="${p?.pis || ''}">
+          </div>
+          <div class="form-group">
+            <label>COFINS (%)</label>
+            <input class="input" id="prod-cofins" type="number" step="0.01" min="0" value="${p?.cofins || ''}">
+          </div>
+          <div class="form-group">
+            <label>NCM</label>
+            <input class="input" id="prod-ncm" type="text" value="${escHtml(p?.ncm || '')}" placeholder="Ex: 8471.30.19">
+          </div>
+          <div class="form-group">
+            <label>CFOP</label>
+            <input class="input" id="prod-cfop" type="text" value="${escHtml(p?.cfop || '')}" placeholder="Ex: 5.101">
+          </div>
+          <div class="form-group">
+            <label>CST</label>
+            <input class="input" id="prod-cst" type="text" value="${escHtml(p?.cst || '')}" placeholder="Ex: 00">
+          </div>
         </div>
       `,
       footerHTML: `
@@ -150,6 +181,13 @@ Pages.produtos = {
     const precoVenda= parseFloat(formValue('prod-preco')) || 0;
     const custo     = parseFloat(formValue('prod-custo')) || 0;
     const qtd       = parseInt(formValue('prod-qtd')) || 0;
+    const icms      = parseFloat(formValue('prod-icms')) || 0;
+    const ipi       = parseFloat(formValue('prod-ipi')) || 0;
+    const pis       = parseFloat(formValue('prod-pis')) || 0;
+    const cofins    = parseFloat(formValue('prod-cofins')) || 0;
+    const ncm       = formValue('prod-ncm');
+    const cfop      = formValue('prod-cfop');
+    const cst       = formValue('prod-cst');
 
     if (!nome || !codigo || precoVenda <= 0) {
       showToast('Preencha Nome, Código e Preço de Venda.', 'warning');
@@ -158,7 +196,7 @@ Pages.produtos = {
 
     App.setLoading(true);
     try {
-      const body = { nome, codigo, categoria, precoVenda, custo, quantidadeEstoque: qtd };
+      const body = { nome, codigo, categoria, precoVenda, custo, quantidadeEstoque: qtd, icms, ipi, pis, cofins, ncm, cfop, cst };
       if (App.editingId) {
         await apiFetch(`/produtos/${App.editingId}`, { method:'PUT', body: JSON.stringify(body) });
         showToast('Produto atualizado com sucesso!', 'success');

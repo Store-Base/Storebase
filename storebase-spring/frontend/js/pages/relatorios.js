@@ -167,13 +167,22 @@ Pages.relatorios = {
     `;
     const canvas = document.getElementById('chart-mais-vendidos');
     if (canvas && produtos.length) {
+      const theme = chartThemeOptions();
       this._charts.maisVendidos = new Chart(canvas, {
         type: 'bar',
         data: {
           labels: produtos.map(p => p.produto),
-          datasets: [{ label: 'Quantidade Vendida', data: produtos.map(p => p.quantidadeVendida), backgroundColor: '#1E3A5F' }],
+          datasets: [{ label: 'Quantidade Vendida', data: produtos.map(p => p.quantidadeVendida), backgroundColor: theme.primary }],
         },
-        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } } },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: theme.muted }, grid: { color: theme.grid } },
+            y: { ticks: { color: theme.muted }, grid: { color: theme.grid } },
+          },
+        },
       });
     }
   },
@@ -185,9 +194,9 @@ Pages.relatorios = {
     const critico = items.filter(i => i.status === 'CRITICO').length;
     panel.innerHTML = `
       <div class="grid-3" style="margin-bottom:20px">
-        <div class="kpi-card"><div class="kpi-label">Estoque OK</div><div class="kpi-value" style="color:#155724">${ok}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Estoque Baixo</div><div class="kpi-value" style="color:#856404">${baixo}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Estoque Crítico</div><div class="kpi-value" style="color:#721c24">${critico}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Estoque OK</div><div class="kpi-value" style="color:var(--loja-success-text)">${ok}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Estoque Baixo</div><div class="kpi-value" style="color:var(--loja-warning-text)">${baixo}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Estoque Crítico</div><div class="kpi-value" style="color:var(--loja-error-text)">${critico}</div></div>
       </div>
       <div class="card" style="padding:0">
         <div class="table-container">
@@ -244,7 +253,7 @@ Pages.relatorios = {
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Receita Líquida Total (${this._filtros.ano})</div>
-          <div class="kpi-value" style="color:var(--loja-success)">${fmt(totalLiquido)}</div>
+          <div class="kpi-value" style="color:var(--loja-success-text)">${fmt(totalLiquido)}</div>
         </div>
       </div>
       <div class="card">
@@ -254,19 +263,23 @@ Pages.relatorios = {
     `;
     const canvas = document.getElementById('chart-faturamento');
     if (canvas) {
+      const theme = chartThemeOptions();
       this._charts.faturamento = new Chart(canvas, {
         type: 'line',
         data: {
           labels: faturamento.map(f => f.mes),
           datasets: [
-            { label:'Receita Bruta',   data: faturamento.map(f => f.receitaBruta),   borderColor:'#28A745', backgroundColor:'rgba(40,167,69,0.06)', tension:0.3, fill:true },
-            { label:'Receita Líquida', data: faturamento.map(f => f.receitaLiquida), borderColor:'#1E3A5F', backgroundColor:'rgba(30,58,95,0.06)',  tension:0.3, fill:true },
+            { label:'Receita Bruta',   data: faturamento.map(f => f.receitaBruta),   borderColor: theme.success, backgroundColor: theme.success + '14', tension:0.3, fill:true },
+            { label:'Receita Líquida', data: faturamento.map(f => f.receitaLiquida), borderColor: theme.primary, backgroundColor: theme.primary + '14', tension:0.3, fill:true },
           ],
         },
         options: {
           responsive:true,
-          plugins:{ legend:{ position:'top' } },
-          scales: { y:{ ticks:{ callback: v => 'R$' + (v/1000).toFixed(0)+'k' } } },
+          plugins:{ legend:{ position:'top', labels:{ color: theme.text } } },
+          scales: {
+            y: { ticks:{ color: theme.muted, callback: v => 'R$' + (v/1000).toFixed(0)+'k' }, grid:{ color: theme.grid } },
+            x: { ticks:{ color: theme.muted }, grid:{ color: theme.grid } },
+          },
         },
       });
     }
