@@ -13,7 +13,7 @@ import java.util.Optional;
 public class ClienteRepository {
 
     public void salvar(Cliente cliente) {
-        String sql = "INSERT INTO cliente (nome, cpf, email, endereco, telefone) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cliente (nome, cpf, email, endereco, telefone, observacoes) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, cliente.getNome());
@@ -21,6 +21,7 @@ public class ClienteRepository {
             stmt.setString(3, cliente.getEmail());
             stmt.setString(4, cliente.getEndereco());
             stmt.setString(5, cliente.getTelefone());
+            stmt.setString(6, cliente.getObservacoes());
             stmt.executeUpdate();
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) cliente.setId(rs.getInt(1));
@@ -31,7 +32,7 @@ public class ClienteRepository {
     }
 
     public void atualizar(Cliente cliente) {
-        String sql = "UPDATE cliente SET nome=?, cpf=?, email=?, endereco=?, telefone=? WHERE id=?";
+        String sql = "UPDATE cliente SET nome=?, cpf=?, email=?, endereco=?, telefone=?, observacoes=? WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cliente.getNome());
@@ -39,7 +40,8 @@ public class ClienteRepository {
             stmt.setString(3, cliente.getEmail());
             stmt.setString(4, cliente.getEndereco());
             stmt.setString(5, cliente.getTelefone());
-            stmt.setInt(6, cliente.getId());
+            stmt.setString(6, cliente.getObservacoes());
+            stmt.setInt(7, cliente.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar cliente: " + e.getMessage());
@@ -121,6 +123,7 @@ public class ClienteRepository {
         c.setEmail(rs.getString("email"));
         c.setEndereco(rs.getString("endereco"));
         c.setTelefone(rs.getString("telefone"));
+        c.setObservacoes(rs.getString("observacoes"));
         return c;
     }
 }

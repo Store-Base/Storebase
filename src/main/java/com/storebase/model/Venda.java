@@ -17,6 +17,7 @@ public class Venda {
     private LocalDate data;
     private int parcelas = 1;
     private double taxaJuros;
+    private String observacoes;
 
     public Venda() {
         this.itens = new ArrayList<>();
@@ -82,6 +83,9 @@ public class Venda {
 
     public double getTaxaJuros() { return taxaJuros; }
     public void setTaxaJuros(double taxaJuros) { this.taxaJuros = taxaJuros; }
+
+    public String getObservacoes() { return observacoes; }
+    public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
 
     // Aliases para o frontend (estrutura achatada)
     public double getTotal() { return this.valorTotal; }
