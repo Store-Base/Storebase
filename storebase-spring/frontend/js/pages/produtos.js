@@ -75,6 +75,9 @@ Pages.produtos = {
               <td>${stockBadgeHTML(p.quantidadeEstoque)}</td>
               <td>
                 <div class="actions-cell">
+                  <button onclick="Pages.produtos._verHistoricoPreco(${p.id},'${escHtml(p.nome)}')" title="Histórico de preço">
+                    <i data-lucide="clock" style="color:#6c757d"></i>
+                  </button>
                   <button onclick="Pages.produtos._openForm(${p.id})" title="Editar">
                     <i data-lucide="pencil" style="color:#6c757d"></i>
                   </button>
@@ -170,6 +173,35 @@ Pages.produtos = {
       this._render();
     } catch (err) {
       showToast(err.message || 'Erro ao salvar produto.', 'error');
+    } finally {
+      App.setLoading(false);
+    }
+  },
+
+  async _verHistoricoPreco(id, nome) {
+    App.setLoading(true);
+    try {
+      const historico = await apiFetch(`/produtos/${id}/historico-preco`);
+      const historicoHTML = historico.length
+        ? historico.map(h => `
+            <div class="historico-item">
+              <div class="hist-date">${fmtDate(h.dataAlteracao)}</div>
+              <div class="hist-items">
+                Preço: ${fmt(h.precoAnterior)} → ${fmt(h.precoNovo)}<br>
+                Custo: ${fmt(h.custoAnterior)} → ${fmt(h.custoNovo)}
+              </div>
+            </div>
+          `).join('')
+        : `<div class="empty-state"><i data-lucide="clock"></i><p>Nenhuma alteração de preço registrada.</p></div>`;
+
+      openModal({
+        title: `Histórico de Preço — ${nome}`,
+        width: 480,
+        contentHTML: historicoHTML,
+        footerHTML: `<button class="btn btn-outline" onclick="closeModal()">Fechar</button>`,
+      });
+    } catch (err) {
+      showToast('Erro ao carregar histórico de preço.', 'error');
     } finally {
       App.setLoading(false);
     }
