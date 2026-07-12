@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.storebase.model.Produto;
+import com.storebase.repository.HistoricoPrecoRepository;
 import com.storebase.repository.ProdutoRepository;
 
 @Service
@@ -14,6 +15,9 @@ public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private HistoricoPrecoRepository historicoPrecoRepository;
 
     public void cadastrar(Produto produto) {
         if (produto.getPrecoVenda() <= 0) {
@@ -32,7 +36,17 @@ public class ProdutoService {
         if (produto.getPrecoVenda() <= 0) {
             throw new IllegalArgumentException("Preço de venda deve ser maior que zero.");
         }
-        buscarPorId(produto.getId());
+        Produto existente = buscarPorId(produto.getId());
+
+        if (existente.getPrecoVenda() != produto.getPrecoVenda()
+                || existente.getCusto() != produto.getCusto()) {
+            historicoPrecoRepository.registrar(
+                produto.getId(),
+                existente.getPrecoVenda(), produto.getPrecoVenda(),
+                existente.getCusto(), produto.getCusto()
+            );
+        }
+
         produtoRepository.atualizar(produto);
     }
 
