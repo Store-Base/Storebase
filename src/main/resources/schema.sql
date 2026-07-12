@@ -82,6 +82,17 @@ ALTER TABLE pedido ADD COLUMN IF NOT EXISTS status VARCHAR(50);
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS parcelas INT NOT NULL DEFAULT 1;
 ALTER TABLE pedido ADD COLUMN IF NOT EXISTS taxa_juros DECIMAL(10,2) NOT NULL DEFAULT 0;
 
+CREATE TABLE IF NOT EXISTS historico_preco_produto (
+    id SERIAL PRIMARY KEY,
+    produto_id INT NOT NULL,
+    preco_anterior DECIMAL(10,2) NOT NULL,
+    preco_novo DECIMAL(10,2) NOT NULL,
+    custo_anterior DECIMAL(10,2) NOT NULL,
+    custo_novo DECIMAL(10,2) NOT NULL,
+    data_alteracao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_historico_produto FOREIGN KEY (produto_id) REFERENCES produto(id)
+);
+
 -- Usuários de demonstração (correspondem às credenciais exibidas na tela de login)
 INSERT INTO usuario (nome, cargo, login, senha, salario) VALUES
     ('Leonardo Marino', 'ADMINISTRADOR',   'leo.admin',   'admin123', 5800.00),

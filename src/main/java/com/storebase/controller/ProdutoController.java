@@ -1,7 +1,9 @@
 package com.storebase.controller;
 
 import com.storebase.model.EntradaEstoque;
+import com.storebase.model.HistoricoPreco;
 import com.storebase.model.Produto;
+import com.storebase.repository.HistoricoPrecoRepository;
 import com.storebase.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,9 @@ public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
+
+    @Autowired
+    private HistoricoPrecoRepository historicoPrecoRepository;
 
     @GetMapping
     public List<Produto> listarTodos() {
@@ -67,6 +72,11 @@ public class ProdutoController {
     @GetMapping("/estoque-baixo")
     public List<Produto> listarEstoqueBaixo(@RequestParam(defaultValue = "10") int limite) {
         return produtoService.listarEstoqueBaixo(limite);
+    }
+
+    @GetMapping("/{id}/historico-preco")
+    public List<HistoricoPreco> historicoPreco(@PathVariable int id) {
+        return historicoPrecoRepository.listarPorProduto(id);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
