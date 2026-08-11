@@ -64,19 +64,20 @@ public class VendaRepository {
 
     public Optional<Venda> buscarPorId(int id) {
         String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, v.parcelas, v.taxa_juros, v.observacoes, " +
-                     "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
-                     "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
-                     "FROM pedido v " +
-                     "LEFT JOIN cliente c ON v.cliente_id = c.id " +
-                     "JOIN usuario u ON v.usuario_id = u.id " +
-                     "WHERE v.id = ?";
+                "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
+                "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
+                "FROM pedido v " +
+                "LEFT JOIN cliente c ON v.cliente_id = c.id " +
+                "JOIN usuario u ON v.usuario_id = u.id " +
+                "WHERE v.id = ?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Venda v = mapear(rs);
-                    v.setItens(carregarItens(v.getId()));
+                    // Agora repassamos a mesma conexão 'conn' para não fechá-la acidentalmente!
+                    v.setItens(carregarItens(v.getId(), conn));
                     return Optional.of(v);
                 }
             }
@@ -89,18 +90,19 @@ public class VendaRepository {
     public List<Venda> listarTodas() {
         List<Venda> lista = new ArrayList<>();
         String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, v.parcelas, v.taxa_juros, v.observacoes, " +
-                     "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
-                     "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
-                     "FROM pedido v " +
-                     "LEFT JOIN cliente c ON v.cliente_id = c.id " +
-                     "JOIN usuario u ON v.usuario_id = u.id " +
-                     "ORDER BY v.data DESC";
+                "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
+                "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
+                "FROM pedido v " +
+                "LEFT JOIN cliente c ON v.cliente_id = c.id " +
+                "JOIN usuario u ON v.usuario_id = u.id " +
+                "ORDER BY v.data DESC";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Venda v = mapear(rs);
-                v.setItens(carregarItens(v.getId()));
+                // Repassando a conexão principal aqui também
+                v.setItens(carregarItens(v.getId(), conn));
                 lista.add(v);
             }
         } catch (SQLException e) {
@@ -112,19 +114,20 @@ public class VendaRepository {
     public List<Venda> listarPorCliente(int clienteId) {
         List<Venda> lista = new ArrayList<>();
         String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, v.parcelas, v.taxa_juros, v.observacoes, " +
-                     "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
-                     "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
-                     "FROM pedido v " +
-                     "JOIN cliente c ON v.cliente_id = c.id " +
-                     "JOIN usuario u ON v.usuario_id = u.id " +
-                     "WHERE v.cliente_id = ? ORDER BY v.data DESC";
+                "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
+                "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
+                "FROM pedido v " +
+                "JOIN cliente c ON v.cliente_id = c.id " +
+                "JOIN usuario u ON v.usuario_id = u.id " +
+                "WHERE v.cliente_id = ? ORDER BY v.data DESC";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, clienteId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Venda v = mapear(rs);
-                    v.setItens(carregarItens(v.getId()));
+                    // E repassando a conexão aqui também
+                    v.setItens(carregarItens(v.getId(), conn));
                     lista.add(v);
                 }
             }
@@ -134,14 +137,15 @@ public class VendaRepository {
         return lista;
     }
 
-    private List<ItemVenda> carregarItens(int vendaId) {
+    // Método refatorado para receber a Connection externa!
+    private List<ItemVenda> carregarItens(int vendaId, Connection conn) {
         List<ItemVenda> itens = new ArrayList<>();
         String sql = "SELECT i.quantidade, i.preco_unitario, " +
-                     "p.id AS p_id, p.nome AS p_nome, p.codigo, p.preco_venda, p.custo, p.quantidade_estoque " +
-                     "FROM item_pedido i JOIN produto p ON i.produto_id = p.id " +
-                     "WHERE i.pedido_id = ?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                "p.id AS p_id, p.nome AS p_nome, p.codigo, p.preco_venda, p.custo, p.quantidade_estoque " +
+                "FROM item_pedido i JOIN produto p ON i.produto_id = p.id " +
+                "WHERE i.pedido_id = ?";
+        // Removemos o "Connection conn = ..." daqui do bloco try para usar a que foi passada por parâmetro
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, vendaId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

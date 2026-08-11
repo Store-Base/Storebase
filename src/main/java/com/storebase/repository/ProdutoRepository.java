@@ -39,7 +39,8 @@ public class ProdutoRepository {
     }
 
     public void atualizar(Produto produto) {
-        String sql = "UPDATE produto SET nome=?, codigo=?, preco_venda=?, custo=?, categoria=?, quantidade_estoque=?, icms=?, ipi=?, pis=?, cofins=?, ncm=?, cfop=?, cst=? WHERE id=?";
+        // Coluna 'ativo' adicionada no UPDATE!
+        String sql = "UPDATE produto SET nome=?, codigo=?, preco_venda=?, custo=?, categoria=?, quantidade_estoque=?, icms=?, ipi=?, pis=?, cofins=?, ncm=?, cfop=?, cst=?, ativo=? WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, produto.getNome());
@@ -55,7 +56,8 @@ public class ProdutoRepository {
             stmt.setString(11, produto.getNcm());
             stmt.setString(12, produto.getCfop());
             stmt.setString(13, produto.getCst());
-            stmt.setInt(14, produto.getId());
+            stmt.setBoolean(14, produto.isAtivo()); // Posição 14 (ativo)
+            stmt.setInt(15, produto.getId());       // Posição 15 (id)
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar produto: " + e.getMessage());
@@ -63,18 +65,20 @@ public class ProdutoRepository {
     }
 
     public void deletar(int id) {
-        String sql = "DELETE FROM produto WHERE id=?";
+        // Soft delete no produto!
+        String sql = "UPDATE produto SET ativo = false WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Erro ao deletar produto: " + e.getMessage());
+            System.err.println("Erro ao desativar produto: " + e.getMessage());
         }
     }
 
     public Optional<Produto> buscarPorId(int id) {
-        String sql = "SELECT * FROM produto WHERE id=?";
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE id=? AND ativo = true";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -89,7 +93,8 @@ public class ProdutoRepository {
 
     public List<Produto> listarTodos() {
         List<Produto> lista = new ArrayList<>();
-        String sql = "SELECT * FROM produto ORDER BY nome";
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE ativo = true ORDER BY nome";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -102,7 +107,8 @@ public class ProdutoRepository {
 
     public List<Produto> buscarPorNome(String nome) {
         List<Produto> lista = new ArrayList<>();
-        String sql = "SELECT * FROM produto WHERE nome ILIKE ? ORDER BY nome";
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE nome ILIKE ? AND ativo = true ORDER BY nome";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, "%" + nome + "%");
@@ -116,7 +122,8 @@ public class ProdutoRepository {
     }
 
     public Optional<Produto> buscarPorCodigo(String codigo) {
-        String sql = "SELECT * FROM produto WHERE codigo=?";
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE codigo=? AND ativo = true";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, codigo);
@@ -131,7 +138,8 @@ public class ProdutoRepository {
 
     public List<Produto> listarEstoqueBaixo(int limite) {
         List<Produto> lista = new ArrayList<>();
-        String sql = "SELECT * FROM produto WHERE quantidade_estoque <= ? ORDER BY quantidade_estoque ASC";
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE quantidade_estoque <= ? AND ativo = true ORDER BY quantidade_estoque ASC";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, limite);
@@ -160,6 +168,7 @@ public class ProdutoRepository {
         p.setNcm(rs.getString("ncm"));
         p.setCfop(rs.getString("cfop"));
         p.setCst(rs.getString("cst"));
+        p.setAtivo(rs.getBoolean("ativo")); // Mapeamento da nova coluna!
         return p;
     }
 }

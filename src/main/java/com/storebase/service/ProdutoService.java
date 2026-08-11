@@ -51,8 +51,9 @@ public class ProdutoService {
     }
 
     public void deletar(int id) {
-        buscarPorId(id);
-        produtoRepository.deletar(id);
+        Produto produto = buscarPorId(id);
+        produto.setAtivo(false);
+        produtoRepository.atualizar(produto);
     }
 
     public Produto buscarPorId(int id) {

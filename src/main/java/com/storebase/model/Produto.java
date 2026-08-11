@@ -17,7 +17,15 @@ public class Produto {
     private String ncm;       // código, ex: "8471.30.19"
     private String cfop;      // código, ex: "5.101"
     private String cst;       // código, ex: "00"
+    private boolean ativo = true;
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
     public Produto() {}
 
     public Produto(String nome, String codigo, double precoVenda, double custo,
