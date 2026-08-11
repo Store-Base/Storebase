@@ -36,8 +36,9 @@ public class FuncionarioService {
     }
 
     public void deletar(int id) {
-        buscarPorId(id);
-        funcionarioRepository.deletar(id);
+        Funcionario funcionario = buscarPorId(id);
+        funcionario.setAtivo(false);
+        funcionarioRepository.atualizar(funcionario);
     }
 
     public Funcionario buscarPorId(int id) {

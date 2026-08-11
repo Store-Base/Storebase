@@ -35,8 +35,9 @@ public class ClienteService {
     }
 
     public void deletar(int id) {
-        buscarPorId(id);
-        clienteRepository.deletar(id);
+        Cliente cliente = buscarPorId(id);
+        cliente.setAtivo(false);
+        clienteRepository.atualizar(cliente);
     }
 
     public Cliente buscarPorId(int id) {

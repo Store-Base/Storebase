@@ -31,7 +31,8 @@ public class FuncionarioRepository {
     }
 
     public void atualizar(Funcionario funcionario) {
-        String sql = "UPDATE usuario SET nome=?, cargo=?, login=?, senha=?, salario=? WHERE id=?";
+        // SQL ajustado para incluir o 'ativo'
+        String sql = "UPDATE usuario SET nome=?, cargo=?, login=?, senha=?, salario=?, ativo=? WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, funcionario.getNome());
@@ -39,7 +40,8 @@ public class FuncionarioRepository {
             stmt.setString(3, funcionario.getLogin());
             stmt.setString(4, funcionario.getSenha());
             stmt.setDouble(5, funcionario.getSalario());
-            stmt.setInt(6, funcionario.getId());
+            stmt.setBoolean(6, funcionario.isAtivo()); // Posição 6: status ativo
+            stmt.setInt(7, funcionario.getId());       // Posição 7: id para o WHERE
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar funcionario: " + e.getMessage());
@@ -47,18 +49,20 @@ public class FuncionarioRepository {
     }
 
     public void deletar(int id) {
-        String sql = "DELETE FROM usuario WHERE id=?";
+        // Soft Delete: em vez de DELETE, fazemos um UPDATE mudando para false
+        String sql = "UPDATE usuario SET ativo = false WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Erro ao deletar funcionario: " + e.getMessage());
+            System.err.println("Erro ao desativar funcionario: " + e.getMessage());
         }
     }
 
     public Optional<Funcionario> buscarPorId(int id) {
-        String sql = "SELECT * FROM usuario WHERE id=?";
+        // Filtrando para trazer apenas usuários ativos
+        String sql = "SELECT * FROM usuario WHERE id=? AND ativo = true";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -73,7 +77,8 @@ public class FuncionarioRepository {
 
     public List<Funcionario> listarTodos() {
         List<Funcionario> lista = new ArrayList<>();
-        String sql = "SELECT * FROM usuario ORDER BY nome";
+        // Filtrando ativos antes de fazer o ORDER BY
+        String sql = "SELECT * FROM usuario WHERE ativo = true ORDER BY nome";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -85,7 +90,8 @@ public class FuncionarioRepository {
     }
 
     public Optional<Funcionario> buscarPorLogin(String login) {
-        String sql = "SELECT * FROM usuario WHERE login=?";
+        // Importante garantir que um funcionário inativo não consiga fazer login
+        String sql = "SELECT * FROM usuario WHERE login=? AND ativo = true";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, login);
@@ -106,6 +112,7 @@ public class FuncionarioRepository {
         f.setLogin(rs.getString("login"));
         f.setSenha(rs.getString("senha"));
         f.setSalario(rs.getDouble("salario"));
+        f.setAtivo(rs.getBoolean("ativo")); // Lendo o dado do banco e setando no objeto
         return f;
     }
 }

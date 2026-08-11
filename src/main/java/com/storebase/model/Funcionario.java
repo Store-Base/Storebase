@@ -8,6 +8,15 @@ public class Funcionario {
     private String login;
     private String senha;
     private double salario;
+    private boolean ativo = true;
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
 
     public Funcionario() {}
 

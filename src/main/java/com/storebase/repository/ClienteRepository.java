@@ -32,7 +32,7 @@ public class ClienteRepository {
     }
 
     public void atualizar(Cliente cliente) {
-        String sql = "UPDATE cliente SET nome=?, cpf=?, email=?, endereco=?, telefone=?, observacoes=? WHERE id=?";
+        String sql = "UPDATE cliente SET nome = ?, cpf = ?, email = ?, endereco = ?, telefone = ?, observacoes = ?, ativo = ? WHERE id = ?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cliente.getNome());
@@ -41,26 +41,28 @@ public class ClienteRepository {
             stmt.setString(4, cliente.getEndereco());
             stmt.setString(5, cliente.getTelefone());
             stmt.setString(6, cliente.getObservacoes());
-            stmt.setInt(7, cliente.getId());
+            stmt.setBoolean(7, cliente.isAtivo()); // Posição 7 é o ativo
+            stmt.setInt(8, cliente.getId());       // Posição 8 é o id do WHERE
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar cliente: " + e.getMessage());
         }
     }
 
+    // Mantivemos o método deletar, mas agora ele faz o Soft Delete direto no banco por segurança!
     public void deletar(int id) {
-        String sql = "DELETE FROM cliente WHERE id=?";
+        String sql = "UPDATE cliente SET ativo = false WHERE id=?";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Erro ao deletar cliente: " + e.getMessage());
+            System.err.println("Erro ao desativar cliente: " + e.getMessage());
         }
     }
 
     public Optional<Cliente> buscarPorId(int id) {
-        String sql = "SELECT * FROM cliente WHERE id=?";
+        String sql = "SELECT * FROM cliente WHERE id=? AND ativo = true";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -75,7 +77,7 @@ public class ClienteRepository {
 
     public List<Cliente> listarTodos() {
         List<Cliente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM cliente ORDER BY nome";
+        String sql = "SELECT * FROM cliente WHERE ativo = true"; // Ponto e vírgula adicionado!
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -88,7 +90,7 @@ public class ClienteRepository {
 
     public List<Cliente> buscarPorNome(String nome) {
         List<Cliente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM cliente WHERE nome ILIKE ? ORDER BY nome";
+        String sql = "SELECT * FROM cliente WHERE nome ILIKE ? AND ativo = true ORDER BY nome";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, "%" + nome + "%");
@@ -102,7 +104,7 @@ public class ClienteRepository {
     }
 
     public Optional<Cliente> buscarPorCpf(String cpf) {
-        String sql = "SELECT * FROM cliente WHERE cpf=?";
+        String sql = "SELECT * FROM cliente WHERE cpf=? AND ativo = true";
         try (Connection conn = AppConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cpf);
@@ -124,6 +126,7 @@ public class ClienteRepository {
         c.setEndereco(rs.getString("endereco"));
         c.setTelefone(rs.getString("telefone"));
         c.setObservacoes(rs.getString("observacoes"));
+        c.setAtivo(rs.getBoolean("ativo")); // Mapeando o status do banco para o objeto!
         return c;
     }
 }

@@ -12,6 +12,16 @@ public class Cliente {
     private String endereco;
     private List<Venda> historicoCompras;
 
+    private boolean ativo = true;
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public Cliente() {
         this.historicoCompras = new ArrayList<>();
     }
