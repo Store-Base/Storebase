@@ -3,7 +3,9 @@
 target/
 
 # Credenciais
+src/main/resources/application.properties
 application.properties
+.env
 
 # IDE
 .idea/

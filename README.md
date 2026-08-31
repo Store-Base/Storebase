@@ -65,18 +65,29 @@ CREATE DATABASE storebase;
 
 ### 2. Configure as credenciais
 
-Edite `src/main/resources/application.properties` com o usuário e a senha do seu PostgreSQL:
+As credenciais **não ficam no repositório**. O `application.properties` versionado foi
+removido; no lugar dele há um `application.properties.example` com placeholders.
 
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/storebase
-spring.datasource.username=SEU_USUARIO
-spring.datasource.password=SUA_SENHA
-spring.datasource.driver-class-name=org.postgresql.Driver
+**2.1.** Copie o exemplo para o arquivo local (ele é ignorado pelo Git e nunca deve ser commitado):
 
-spring.sql.init.mode=always
-spring.sql.init.schema-locations=classpath:schema.sql
-spring.sql.init.continue-on-error=true
+```bash
+cp src/main/resources/application.properties.example src/main/resources/application.properties
 ```
+
+**2.2.** Defina as variáveis de ambiente com os dados do seu PostgreSQL. No Windows, via
+PowerShell, no nível de usuário:
+
+```powershell
+[Environment]::SetEnvironmentVariable("DB_URL", "jdbc:postgresql://localhost:5432/storebase", "User")
+[Environment]::SetEnvironmentVariable("DB_USER", "postgres", "User")
+[Environment]::SetEnvironmentVariable("DB_PASSWORD", "sua-senha-aqui", "User")
+```
+
+Reabra o terminal e a IDE para que as variáveis sejam lidas. Na IntelliJ, uma alternativa
+é definir as variáveis na configuração de execução do projeto.
+
+> As mesmas três variáveis (`DB_URL`, `DB_USER`, `DB_PASSWORD`) são lidas tanto pelo
+> `application.properties` quanto pela classe `AppConfig`.
 
 > O `schema.sql` cria as tabelas, os usuários de demonstração e popula produtos e clientes de exemplo na primeira execução.
 
