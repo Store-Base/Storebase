@@ -1,6 +1,7 @@
 package com.storebase.config;
 
 import com.storebase.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,12 @@ public class SecurityConfig {
                         "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**"
                 ).permitAll()
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(ex -> ex
+                // Sem token / token invalido -> 401 (o frontend faz logout).
+                // Token valido mas papel errado -> 403 (tratado pelo handler padrao).
+                .authenticationEntryPoint((req, res, e) ->
+                        res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
