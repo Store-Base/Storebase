@@ -7,6 +7,7 @@ import com.storebase.repository.HistoricoPrecoRepository;
 import com.storebase.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/produtos")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR','GERENTE_ESTOQUE')")
 public class ProdutoController {
 
     @Autowired

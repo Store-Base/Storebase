@@ -5,6 +5,7 @@ import com.storebase.security.JwtUtil;
 import com.storebase.service.FuncionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/funcionarios")
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class FuncionarioController {
 
     @Autowired
@@ -51,6 +53,7 @@ public class FuncionarioController {
     }
 
     @PostMapping("/autenticar")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Map<String, Object>> autenticar(@RequestBody Map<String, String> credenciais) {
         String login = credenciais.get("login");
         String senha = credenciais.get("senha");

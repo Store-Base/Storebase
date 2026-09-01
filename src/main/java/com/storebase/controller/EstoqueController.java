@@ -3,12 +3,14 @@ package com.storebase.controller;
 import com.storebase.model.Produto;
 import com.storebase.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
 @RequestMapping("/estoque")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR','GERENTE_ESTOQUE')")
 public class EstoqueController {
 
     @Autowired
