@@ -1,23 +1,42 @@
 package com.storebase.config;
 
+import com.storebase.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-// PROVISÓRIO: libera todos os endpoints. Existe apenas para que a aplicação
-// continue funcionando depois que o spring-boot-starter-security entrou no
-// classpath (a autoconfiguração de segurança bloquearia tudo por padrão).
-// Será substituída em P0.3 (feature/autenticacao-jwt) pela regra de
-// autorização real por perfil.
+/**
+ * Autorizacao real por perfil (P0.3). Substitui a SecurityConfig provisoria de
+ * P0.2 que liberava tudo. Toda rota exige token valido, exceto o login e o
+ * preflight de CORS. O papel por endpoint fica em cada controller via @PreAuthorize.
+ */
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight de CORS
+                .requestMatchers("/funcionarios/autenticar").permitAll()
+                .requestMatchers(
+                        "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

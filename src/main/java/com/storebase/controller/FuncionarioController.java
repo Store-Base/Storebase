@@ -1,6 +1,7 @@
 package com.storebase.controller;
 
 import com.storebase.model.Funcionario;
+import com.storebase.security.JwtUtil;
 import com.storebase.service.FuncionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,9 @@ public class FuncionarioController {
 
     @Autowired
     private FuncionarioService funcionarioService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping
     public List<Funcionario> listarTodos() {
@@ -52,7 +56,8 @@ public class FuncionarioController {
         String senha = credenciais.get("senha");
         Funcionario funcionario = funcionarioService.autenticar(login, senha);
 
-        String token = "token-" + funcionario.getId() + "-" + System.currentTimeMillis();
+        String token = jwtUtil.gerarToken(
+                funcionario.getId(), funcionario.getLogin(), funcionario.getCargo());
 
         Map<String, Object> resposta = new LinkedHashMap<>();
         resposta.put("id",    funcionario.getId());
