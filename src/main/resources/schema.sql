@@ -105,12 +105,21 @@ CREATE TABLE IF NOT EXISTS historico_preco_produto (
     CONSTRAINT fk_historico_produto FOREIGN KEY (produto_id) REFERENCES produto(id)
 );
 
--- Usuários de demonstração (correspondem às credenciais exibidas na tela de login)
+-- Usuários de demonstração (correspondem às credenciais exibidas na tela de login).
+-- Senhas com hash BCrypt (custo 10). O texto original vai no comentário apenas
+-- como referência para a equipe: admin123 / vend123 / est123.
 INSERT INTO usuario (nome, cargo, login, senha, salario) VALUES
-    ('Leonardo Marino', 'ADMINISTRADOR',   'leo.admin',   'admin123', 5800.00),
-    ('Vinicius Vendas', 'VENDEDOR',         'vini.vendas', 'vend123',  2800.00),
-    ('Carlos Estoque',  'GERENTE_ESTOQUE',  'car.estoque', 'est123',   3200.00)
+    ('Leonardo Marino', 'ADMINISTRADOR',   'leo.admin',   '$2b$10$7n/ZnYi5jAIxGzZ70XHFPud7JEtnOHEesGobEVe/jCW4JeW97qZrq', 5800.00), -- admin123
+    ('Vinicius Vendas', 'VENDEDOR',         'vini.vendas', '$2b$10$e3JQM0fu7fpd/yuPss72CeXnuD2esR3QthlDE/ixo0oUZ5XUJusRe', 2800.00), -- vend123
+    ('Carlos Estoque',  'GERENTE_ESTOQUE',  'car.estoque', '$2b$10$FGy7pLtlvhgmV.58jmNSFebOCu6h1mwXpQ/1UIg7c1ucL0rJ0DVEm', 3200.00)  -- est123
 ON CONFLICT (login) DO NOTHING;
+
+-- Migração de bancos já existentes: o ON CONFLICT acima não atualiza linhas
+-- antigas. Estes UPDATE só tocam a linha enquanto ela ainda estiver com a
+-- senha em texto puro, então rodam uma vez e nunca sobrescrevem um hash real.
+UPDATE usuario SET senha = '$2b$10$7n/ZnYi5jAIxGzZ70XHFPud7JEtnOHEesGobEVe/jCW4JeW97qZrq' WHERE login = 'leo.admin'   AND senha = 'admin123';
+UPDATE usuario SET senha = '$2b$10$e3JQM0fu7fpd/yuPss72CeXnuD2esR3QthlDE/ixo0oUZ5XUJusRe' WHERE login = 'vini.vendas' AND senha = 'vend123';
+UPDATE usuario SET senha = '$2b$10$FGy7pLtlvhgmV.58jmNSFebOCu6h1mwXpQ/1UIg7c1ucL0rJ0DVEm' WHERE login = 'car.estoque' AND senha = 'est123';
 
 -- Garante o salário dos usuários demo mesmo se já existirem sem valor
 UPDATE usuario SET salario = 5800.00 WHERE login = 'leo.admin'   AND salario = 0;

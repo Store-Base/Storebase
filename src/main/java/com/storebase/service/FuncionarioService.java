@@ -3,6 +3,7 @@ package com.storebase.service;
 import com.storebase.model.Funcionario;
 import com.storebase.repository.FuncionarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,9 @@ public class FuncionarioService {
 
     @Autowired
     private FuncionarioRepository funcionarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public void cadastrar(Funcionario funcionario) {
         if (funcionario.getLogin() == null || funcionario.getLogin().isBlank()) {
@@ -23,6 +27,7 @@ public class FuncionarioService {
         funcionarioRepository.buscarPorLogin(funcionario.getLogin()).ifPresent(f -> {
             throw new IllegalArgumentException("Já existe um funcionário com o login: " + funcionario.getLogin());
         });
+        funcionario.setSenha(passwordEncoder.encode(funcionario.getSenha()));
         funcionarioRepository.salvar(funcionario);
     }
 
@@ -30,7 +35,9 @@ public class FuncionarioService {
         Funcionario existente = buscarPorId(funcionario.getId());
         // Mantém a senha atual quando o formulário não envia uma nova
         if (funcionario.getSenha() == null || funcionario.getSenha().isBlank()) {
-            funcionario.setSenha(existente.getSenha());
+            funcionario.setSenha(existente.getSenha()); // já é hash, copia sem reprocessar
+        } else {
+            funcionario.setSenha(passwordEncoder.encode(funcionario.getSenha())); // gera novo hash
         }
         funcionarioRepository.atualizar(funcionario);
     }
@@ -53,7 +60,7 @@ public class FuncionarioService {
     public Funcionario autenticar(String login, String senha) {
         Funcionario funcionario = funcionarioRepository.buscarPorLogin(login)
                 .orElseThrow(() -> new IllegalArgumentException("Login ou senha inválidos."));
-        if (!funcionario.getSenha().equals(senha)) {
+        if (!passwordEncoder.matches(senha, funcionario.getSenha())) {
             throw new IllegalArgumentException("Login ou senha inválidos.");
         }
         return funcionario;
