@@ -9,6 +9,7 @@ import com.storebase.model.Venda;
 import com.storebase.service.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/vendas")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR','VENDEDOR')")
 public class VendaController {
 
     @Autowired

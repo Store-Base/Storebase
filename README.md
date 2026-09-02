@@ -83,11 +83,22 @@ PowerShell, no nível de usuário:
 [Environment]::SetEnvironmentVariable("DB_PASSWORD", "sua-senha-aqui", "User")
 ```
 
+**2.3.** Defina também o segredo de assinatura do JWT (`JWT_SECRET`). O valor **não vai
+para o repositório** — gere um aleatório localmente:
+
+```powershell
+$bytes = New-Object byte[] 64
+[Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+[Environment]::SetEnvironmentVariable("JWT_SECRET", [Convert]::ToBase64String($bytes), "User")
+```
+
 Reabra o terminal e a IDE para que as variáveis sejam lidas. Na IntelliJ, uma alternativa
 é definir as variáveis na configuração de execução do projeto.
 
-> As mesmas três variáveis (`DB_URL`, `DB_USER`, `DB_PASSWORD`) são lidas tanto pelo
-> `application.properties` quanto pela classe `AppConfig`.
+> As três variáveis do banco (`DB_URL`, `DB_USER`, `DB_PASSWORD`) são lidas tanto pelo
+> `application.properties` quanto pela classe `AppConfig`. A `JWT_SECRET` é lida pelo
+> `application.properties` (`jwt.secret`); a validade do token vem de `jwt.expiration-ms`
+> (padrão 8 h).
 
 > O `schema.sql` cria as tabelas, os usuários de demonstração e popula produtos e clientes de exemplo na primeira execução.
 
@@ -122,6 +133,34 @@ A tela de login já vem com três usuários de exemplo, um para cada perfil:
 - **Administrador** — acesso completo: dashboard gerencial, produtos, clientes, funcionários, vendas, orçamentos, estoque e relatórios.
 - **Vendedor** — dashboard de vendas, nova venda, clientes e orçamentos.
 - **Gerente de Estoque** — dashboard de estoque, produtos e controle de estoque.
+
+---
+
+## Autenticação e autorização
+
+O login em `POST /funcionarios/autenticar` devolve um **JWT assinado** (HS256), que o
+frontend guarda e envia em cada requisição no header `Authorization: Bearer <token>`.
+O backend valida a assinatura e a expiração em todas as rotas — não há mais token
+"de fachada".
+
+- **Rotas públicas:** apenas `POST /funcionarios/autenticar` e o preflight `OPTIONS`.
+- **Sem token ou token expirado:** `401` (o frontend encerra a sessão).
+- **Token válido, mas perfil sem acesso:** `403`.
+
+Autorização por perfil (via `@PreAuthorize` em cada controller):
+
+| Recurso | Perfis com acesso |
+|---|---|
+| `/produtos`, `/estoque` | ADMINISTRADOR, GERENTE_ESTOQUE |
+| `/clientes`, `/orcamentos`, `/vendas` | ADMINISTRADOR, VENDEDOR |
+| `/funcionarios` | ADMINISTRADOR |
+| `/relatorios` | ADMINISTRADOR |
+| `/dashboard/stats*`, `/dashboard/grafico`, `/dashboard/ultimas-vendas` | ADMINISTRADOR |
+| `/dashboard/*-vendedor`, `/dashboard/minhas-vendas` | VENDEDOR |
+| `/dashboard/stats-estoque` | GERENTE_ESTOQUE |
+
+As rotas de dashboard do vendedor identificam o funcionário pelo **id contido no
+token**, não por parâmetro — um vendedor não consegue ver os números de outro.
 
 ---
 

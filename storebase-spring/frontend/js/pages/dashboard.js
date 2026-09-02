@@ -129,11 +129,11 @@ Pages.dashboard = {
   async _loadVendedor() {
     App.setLoading(true);
     try {
-      const id = App.user.id;
+      // O backend identifica o vendedor pelo token; nao enviamos mais funcId.
       const [stats, grafico, minhasVendas] = await Promise.all([
-        apiFetch(`/dashboard/stats-vendedor?funcId=${id}`),
-        apiFetch(`/dashboard/grafico-vendedor?funcId=${id}`),
-        apiFetch(`/dashboard/minhas-vendas?funcId=${id}`),
+        apiFetch('/dashboard/stats-vendedor'),
+        apiFetch('/dashboard/grafico-vendedor'),
+        apiFetch('/dashboard/minhas-vendas'),
       ]);
 
       const el = document.getElementById('page-dashboard');

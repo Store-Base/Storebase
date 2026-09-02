@@ -7,6 +7,7 @@ import com.storebase.model.Venda;
 import com.storebase.service.OrcamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/orcamentos")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR','VENDEDOR')")
 public class OrcamentoController {
 
     @Autowired

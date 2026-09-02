@@ -11,7 +11,12 @@ async function apiFetch(endpoint, options = {}) {
     },
   });
 
+  // 401: sem token ou token expirado/invalido -> encerra a sessao.
   if (res.status === 401) { App.logout(); return null; }
+  // 403: autenticado, mas o perfil nao tem acesso ao recurso.
+  if (res.status === 403) {
+    throw { status: 403, message: 'Voce nao tem permissao para acessar este recurso.' };
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw { status: res.status, message: err.message || 'Erro no servidor.' };

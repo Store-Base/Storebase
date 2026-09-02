@@ -5,3 +5,9 @@ spring.datasource.driver-class-name=org.postgresql.Driver
 
 spring.sql.init.mode=always
 spring.sql.init.schema-locations=classpath:schema.sql
+
+# Segredo de assinatura do JWT. NUNCA versione o valor real: gere localmente e
+# exporte como variavel de ambiente JWT_SECRET (veja o README).
+jwt.secret=${JWT_SECRET}
+# Validade do token em milissegundos (28800000 = 8h). Ajuste conforme o turno da loja.
+jwt.expiration-ms=28800000
