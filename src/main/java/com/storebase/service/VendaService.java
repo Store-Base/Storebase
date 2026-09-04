@@ -8,6 +8,7 @@ import com.storebase.repository.ProdutoRepository;
 import com.storebase.repository.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class VendaService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    @Transactional
     public void registrarVenda(Venda venda) {
         if (venda.getItens() == null || venda.getItens().isEmpty()) {
             throw new IllegalArgumentException("A venda deve conter ao menos um item.");
@@ -53,7 +55,11 @@ public class VendaService {
             venda.setValorTotal(base + juros);
         }
 
-        vendaRepository.salvar(venda);
+        int vendaId = vendaRepository.inserirPedido(venda);
+        venda.setId(vendaId);
+        for (ItemVenda item : venda.getItens()) {
+            vendaRepository.inserirItem(vendaId, item);
+        }
 
         for (ItemVenda item : venda.getItens()) {
             Produto produto = item.getProduto();
