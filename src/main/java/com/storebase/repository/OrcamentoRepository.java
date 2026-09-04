@@ -1,250 +1,29 @@
 package com.storebase.repository;
 
-import com.storebase.config.AppConfig;
 import com.storebase.model.ItemOrcamento;
 import com.storebase.model.Orcamento;
 import com.storebase.model.Produto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlParameterValue;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class OrcamentoRepository {
 
-    public void cadastrar(Orcamento orc) {
-        Connection conn = AppConfig.getConnection();
-        try {
-            conn.setAutoCommit(false);
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-            String sqlOrc = "INSERT INTO orcamento (valor_total, status, cliente_id, usuario_id, nome_comprador, cpf_cnpj) VALUES (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(sqlOrc, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setDouble(1, orc.getValorTotal());
-                stmt.setString(2, orc.getStatus());
-                if (orc.getClienteId() > 0) {
-                    stmt.setInt(3, orc.getClienteId());
-                } else {
-                    stmt.setNull(3, Types.INTEGER);
-                }
-                stmt.setInt(4, orc.getUsuarioId());
-                stmt.setString(5, orc.getNomeComprador());
-                stmt.setString(6, orc.getCpfCnpj());
-                stmt.executeUpdate();
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) orc.setId(rs.getInt(1));
-                }
-            }
-
-            String sqlItem = "INSERT INTO item_orcamento (orcamento_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)";
-            for (ItemOrcamento item : orc.getItens()) {
-                try (PreparedStatement stmt = conn.prepareStatement(sqlItem)) {
-                    stmt.setInt(1, orc.getId());
-                    stmt.setInt(2, item.getProduto().getId());
-                    stmt.setInt(3, item.getQuantidade());
-                    stmt.setDouble(4, item.getPrecoUnitario());
-                    stmt.executeUpdate();
-                }
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            try { conn.rollback(); } catch (SQLException ex) { System.err.println(ex.getMessage()); }
-            System.err.println("Erro ao cadastrar orcamento: " + e.getMessage());
-        } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException e) { System.err.println(e.getMessage()); }
-        }
-    }
-
-    public List<Orcamento> listarTodos() {
-        List<Orcamento> lista = new ArrayList<>();
-        String sql = "SELECT * FROM orcamento ORDER BY id DESC";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Orcamento o = mapear(rs);
-                o.setItens(mapearItens(o.getId()));
-                lista.add(o);
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar orcamentos: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    public Optional<Orcamento> buscarPorId(int id) {
-        String sql = "SELECT * FROM orcamento WHERE id = ?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Orcamento o = mapear(rs);
-                    o.setItens(mapearItens(o.getId()));
-                    return Optional.of(o);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar orcamento por id: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
-
-    private List<ItemOrcamento> mapearItens(int orcamentoId) {
-        List<ItemOrcamento> itens = new ArrayList<>();
-        String sql = "SELECT i.orcamento_id, i.quantidade, i.preco_unitario, " +
-                     "p.id AS p_id, p.nome AS p_nome, p.codigo, p.preco_venda, p.custo, " +
-                     "p.categoria, p.quantidade_estoque " +
-                     "FROM item_orcamento i JOIN produto p ON i.produto_id = p.id " +
-                     "WHERE i.orcamento_id = ?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, orcamentoId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Produto p = new Produto();
-                    p.setId(rs.getInt("p_id"));
-                    p.setNome(rs.getString("p_nome"));
-                    p.setCodigo(rs.getString("codigo"));
-                    p.setPrecoVenda(rs.getDouble("preco_venda"));
-                    p.setCusto(rs.getDouble("custo"));
-                    p.setCategoria(rs.getString("categoria"));
-                    p.setQuantidadeEstoque(rs.getInt("quantidade_estoque"));
-
-                    ItemOrcamento item = new ItemOrcamento(
-                            rs.getInt("orcamento_id"),
-                            p,
-                            rs.getInt("quantidade"),
-                            rs.getDouble("preco_unitario")
-                    );
-                    itens.add(item);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao carregar itens do orcamento: " + e.getMessage());
-        }
-        return itens;
-    }
-
-    public void adicionarItem(int orcamentoId, ItemOrcamento item) {
-        String sql = "INSERT INTO item_orcamento (orcamento_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?) " +
-                     "ON CONFLICT (orcamento_id, produto_id) DO UPDATE SET quantidade = EXCLUDED.quantidade, preco_unitario = EXCLUDED.preco_unitario";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, orcamentoId);
-            stmt.setInt(2, item.getProduto().getId());
-            stmt.setInt(3, item.getQuantidade());
-            stmt.setDouble(4, item.getPrecoUnitario());
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao adicionar item ao orcamento: " + e.getMessage());
-        }
-    }
-
-    public void removerItem(int orcamentoId, int produtoId) {
-        String sql = "DELETE FROM item_orcamento WHERE orcamento_id = ? AND produto_id = ?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, orcamentoId);
-            stmt.setInt(2, produtoId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao remover item do orcamento: " + e.getMessage());
-        }
-    }
-
-    public void atualizarStatus(int id, String status) {
-        String sql = "UPDATE orcamento SET status = ? WHERE id = ?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, status);
-            stmt.setInt(2, id);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar status do orcamento: " + e.getMessage());
-        }
-    }
-
-    public void atualizarValorTotal(int orcamentoId, double valorTotal) {
-        String sql = "UPDATE orcamento SET valor_total = ? WHERE id = ?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDouble(1, valorTotal);
-            stmt.setInt(2, orcamentoId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar valor total do orcamento: " + e.getMessage());
-        }
-    }
-
-    public void deletar(int id) {
-        Connection conn = AppConfig.getConnection();
-        try {
-            conn.setAutoCommit(false);
-            String sqlItens = "DELETE FROM item_orcamento WHERE orcamento_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sqlItens)) {
-                stmt.setInt(1, id);
-                stmt.executeUpdate();
-            }
-            String sqlOrc = "DELETE FROM orcamento WHERE id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sqlOrc)) {
-                stmt.setInt(1, id);
-                stmt.executeUpdate();
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            try { conn.rollback(); } catch (SQLException ex) { System.err.println(ex.getMessage()); }
-            System.err.println("Erro ao deletar orcamento: " + e.getMessage());
-        } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException e) { System.err.println(e.getMessage()); }
-        }
-    }
-
-    public void atualizar(Orcamento orc) {
-        Connection conn = AppConfig.getConnection();
-        try {
-            conn.setAutoCommit(false);
-
-            String sqlOrc = "UPDATE orcamento SET valor_total=?, cliente_id=?, usuario_id=?, nome_comprador=? WHERE id=?";
-            try (PreparedStatement stmt = conn.prepareStatement(sqlOrc)) {
-                stmt.setDouble(1, orc.getValorTotal());
-                if (orc.getClienteId() > 0) stmt.setInt(2, orc.getClienteId());
-                else stmt.setNull(2, Types.INTEGER);
-                stmt.setInt(3, orc.getUsuarioId());
-                stmt.setString(4, orc.getNomeComprador());
-                stmt.setInt(5, orc.getId());
-                stmt.executeUpdate();
-            }
-
-            String sqlDel = "DELETE FROM item_orcamento WHERE orcamento_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sqlDel)) {
-                stmt.setInt(1, orc.getId());
-                stmt.executeUpdate();
-            }
-
-            String sqlItem = "INSERT INTO item_orcamento (orcamento_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)";
-            for (ItemOrcamento item : orc.getItens()) {
-                try (PreparedStatement stmt = conn.prepareStatement(sqlItem)) {
-                    stmt.setInt(1, orc.getId());
-                    stmt.setInt(2, item.getProduto().getId());
-                    stmt.setInt(3, item.getQuantidade());
-                    stmt.setDouble(4, item.getPrecoUnitario());
-                    stmt.executeUpdate();
-                }
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            try { conn.rollback(); } catch (SQLException ex) { System.err.println(ex.getMessage()); }
-            System.err.println("Erro ao atualizar orcamento: " + e.getMessage());
-        } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException e) { System.err.println(e.getMessage()); }
-        }
-    }
-
-    private Orcamento mapear(ResultSet rs) throws SQLException {
+    private static final RowMapper<Orcamento> MAPPER = (rs, rowNum) -> {
         Orcamento o = new Orcamento();
         o.setId(rs.getInt("id"));
         o.setValorTotal(rs.getDouble("valor_total"));
@@ -256,5 +35,114 @@ public class OrcamentoRepository {
         Timestamp ts = rs.getTimestamp("data");
         if (ts != null) o.setData(ts.toLocalDateTime().toLocalDate().toString());
         return o;
+    };
+
+    private static final RowMapper<ItemOrcamento> ITEM_MAPPER = (rs, rowNum) -> {
+        Produto p = new Produto();
+        p.setId(rs.getInt("p_id"));
+        p.setNome(rs.getString("p_nome"));
+        p.setCodigo(rs.getString("codigo"));
+        p.setPrecoVenda(rs.getDouble("preco_venda"));
+        p.setCusto(rs.getDouble("custo"));
+        p.setCategoria(rs.getString("categoria"));
+        p.setQuantidadeEstoque(rs.getInt("quantidade_estoque"));
+        return new ItemOrcamento(
+                rs.getInt("orcamento_id"),
+                p,
+                rs.getInt("quantidade"),
+                rs.getDouble("preco_unitario"));
+    };
+
+    /**
+     * Insere apenas o cabecalho do orcamento e devolve o id gerado. A transacao
+     * que amarra orcamento + itens fica em OrcamentoService (@Transactional).
+     */
+    public int inserirOrcamento(Orcamento orc) {
+        String sql = "INSERT INTO orcamento (valor_total, status, cliente_id, usuario_id, nome_comprador, cpf_cnpj) VALUES (?, ?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(conn -> {
+            PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"id"});
+            stmt.setDouble(1, orc.getValorTotal());
+            stmt.setString(2, orc.getStatus());
+            if (orc.getClienteId() > 0) {
+                stmt.setInt(3, orc.getClienteId());
+            } else {
+                stmt.setNull(3, Types.INTEGER);
+            }
+            stmt.setInt(4, orc.getUsuarioId());
+            stmt.setString(5, orc.getNomeComprador());
+            stmt.setString(6, orc.getCpfCnpj());
+            return stmt;
+        }, keyHolder);
+        return keyHolder.getKey().intValue();
+    }
+
+    public void atualizarOrcamento(Orcamento orc) {
+        String sql = "UPDATE orcamento SET valor_total=?, cliente_id=?, usuario_id=?, nome_comprador=? WHERE id=?";
+        Object clienteId = orc.getClienteId() > 0
+                ? orc.getClienteId()
+                : new SqlParameterValue(Types.INTEGER, null);
+        jdbcTemplate.update(sql, orc.getValorTotal(), clienteId, orc.getUsuarioId(),
+                orc.getNomeComprador(), orc.getId());
+    }
+
+    /** INSERT simples de item, usado dentro das transacoes de criar/atualizar. */
+    public void inserirItem(int orcamentoId, ItemOrcamento item) {
+        String sql = "INSERT INTO item_orcamento (orcamento_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, orcamentoId, item.getProduto().getId(),
+                item.getQuantidade(), item.getPrecoUnitario());
+    }
+
+    public void removerItens(int orcamentoId) {
+        jdbcTemplate.update("DELETE FROM item_orcamento WHERE orcamento_id = ?", orcamentoId);
+    }
+
+    public void removerOrcamento(int id) {
+        jdbcTemplate.update("DELETE FROM orcamento WHERE id = ?", id);
+    }
+
+    public List<Orcamento> listarTodos() {
+        List<Orcamento> lista = jdbcTemplate.query("SELECT * FROM orcamento ORDER BY id DESC", MAPPER);
+        for (Orcamento o : lista) {
+            o.setItens(mapearItens(o.getId()));
+        }
+        return lista;
+    }
+
+    public Optional<Orcamento> buscarPorId(int id) {
+        Optional<Orcamento> orcamento = jdbcTemplate
+                .query("SELECT * FROM orcamento WHERE id = ?", MAPPER, id)
+                .stream().findFirst();
+        orcamento.ifPresent(o -> o.setItens(mapearItens(o.getId())));
+        return orcamento;
+    }
+
+    private List<ItemOrcamento> mapearItens(int orcamentoId) {
+        String sql = "SELECT i.orcamento_id, i.quantidade, i.preco_unitario, " +
+                     "p.id AS p_id, p.nome AS p_nome, p.codigo, p.preco_venda, p.custo, " +
+                     "p.categoria, p.quantidade_estoque " +
+                     "FROM item_orcamento i JOIN produto p ON i.produto_id = p.id " +
+                     "WHERE i.orcamento_id = ?";
+        return jdbcTemplate.query(sql, ITEM_MAPPER, orcamentoId);
+    }
+
+    public void adicionarItem(int orcamentoId, ItemOrcamento item) {
+        String sql = "INSERT INTO item_orcamento (orcamento_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?) " +
+                     "ON CONFLICT (orcamento_id, produto_id) DO UPDATE SET quantidade = EXCLUDED.quantidade, preco_unitario = EXCLUDED.preco_unitario";
+        jdbcTemplate.update(sql, orcamentoId, item.getProduto().getId(),
+                item.getQuantidade(), item.getPrecoUnitario());
+    }
+
+    public void removerItem(int orcamentoId, int produtoId) {
+        jdbcTemplate.update("DELETE FROM item_orcamento WHERE orcamento_id = ? AND produto_id = ?",
+                orcamentoId, produtoId);
+    }
+
+    public void atualizarStatus(int id, String status) {
+        jdbcTemplate.update("UPDATE orcamento SET status = ? WHERE id = ?", status, id);
+    }
+
+    public void atualizarValorTotal(int orcamentoId, double valorTotal) {
+        jdbcTemplate.update("UPDATE orcamento SET valor_total = ? WHERE id = ?", valorTotal, orcamentoId);
     }
 }
