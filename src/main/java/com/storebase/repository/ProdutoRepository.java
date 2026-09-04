@@ -1,158 +1,24 @@
 package com.storebase.repository;
 
-import com.storebase.config.AppConfig;
 import com.storebase.model.Produto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class ProdutoRepository {
 
-    public void salvar(Produto produto) {
-        String sql = "INSERT INTO produto (nome, codigo, preco_venda, custo, categoria, quantidade_estoque, icms, ipi, pis, cofins, ncm, cfop, cst) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, produto.getNome());
-            stmt.setString(2, produto.getCodigo());
-            stmt.setDouble(3, produto.getPrecoVenda());
-            stmt.setDouble(4, produto.getCusto());
-            stmt.setString(5, produto.getCategoria());
-            stmt.setInt(6, produto.getQuantidadeEstoque());
-            stmt.setDouble(7, produto.getIcms());
-            stmt.setDouble(8, produto.getIpi());
-            stmt.setDouble(9, produto.getPis());
-            stmt.setDouble(10, produto.getCofins());
-            stmt.setString(11, produto.getNcm());
-            stmt.setString(12, produto.getCfop());
-            stmt.setString(13, produto.getCst());
-            stmt.executeUpdate();
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) produto.setId(rs.getInt(1));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao salvar produto: " + e.getMessage());
-        }
-    }
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    public void atualizar(Produto produto) {
-        // Coluna 'ativo' adicionada no UPDATE!
-        String sql = "UPDATE produto SET nome=?, codigo=?, preco_venda=?, custo=?, categoria=?, quantidade_estoque=?, icms=?, ipi=?, pis=?, cofins=?, ncm=?, cfop=?, cst=?, ativo=? WHERE id=?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, produto.getNome());
-            stmt.setString(2, produto.getCodigo());
-            stmt.setDouble(3, produto.getPrecoVenda());
-            stmt.setDouble(4, produto.getCusto());
-            stmt.setString(5, produto.getCategoria());
-            stmt.setInt(6, produto.getQuantidadeEstoque());
-            stmt.setDouble(7, produto.getIcms());
-            stmt.setDouble(8, produto.getIpi());
-            stmt.setDouble(9, produto.getPis());
-            stmt.setDouble(10, produto.getCofins());
-            stmt.setString(11, produto.getNcm());
-            stmt.setString(12, produto.getCfop());
-            stmt.setString(13, produto.getCst());
-            stmt.setBoolean(14, produto.isAtivo()); // Posição 14 (ativo)
-            stmt.setInt(15, produto.getId());       // Posição 15 (id)
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar produto: " + e.getMessage());
-        }
-    }
-
-    public void deletar(int id) {
-        // Soft delete no produto!
-        String sql = "UPDATE produto SET ativo = false WHERE id=?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao desativar produto: " + e.getMessage());
-        }
-    }
-
-    public Optional<Produto> buscarPorId(int id) {
-        // Filtro ativo = true
-        String sql = "SELECT * FROM produto WHERE id=? AND ativo = true";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return Optional.of(mapear(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar produto por id: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
-
-    public List<Produto> listarTodos() {
-        List<Produto> lista = new ArrayList<>();
-        // Filtro ativo = true
-        String sql = "SELECT * FROM produto WHERE ativo = true ORDER BY nome";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) lista.add(mapear(rs));
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar produtos: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    public List<Produto> buscarPorNome(String nome) {
-        List<Produto> lista = new ArrayList<>();
-        // Filtro ativo = true
-        String sql = "SELECT * FROM produto WHERE nome ILIKE ? AND ativo = true ORDER BY nome";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + nome + "%");
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) lista.add(mapear(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar produtos por nome: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    public Optional<Produto> buscarPorCodigo(String codigo) {
-        // Filtro ativo = true
-        String sql = "SELECT * FROM produto WHERE codigo=? AND ativo = true";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, codigo);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return Optional.of(mapear(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar produto por codigo: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
-
-    public List<Produto> listarEstoqueBaixo(int limite) {
-        List<Produto> lista = new ArrayList<>();
-        // Filtro ativo = true
-        String sql = "SELECT * FROM produto WHERE quantidade_estoque <= ? AND ativo = true ORDER BY quantidade_estoque ASC";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, limite);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) lista.add(mapear(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar estoque baixo: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    private Produto mapear(ResultSet rs) throws SQLException {
+    private static final RowMapper<Produto> MAPPER = (rs, rowNum) -> {
         Produto p = new Produto();
         p.setId(rs.getInt("id"));
         p.setNome(rs.getString("nome"));
@@ -170,5 +36,72 @@ public class ProdutoRepository {
         p.setCst(rs.getString("cst"));
         p.setAtivo(rs.getBoolean("ativo")); // Mapeamento da nova coluna!
         return p;
+    };
+
+    public void salvar(Produto produto) {
+        String sql = "INSERT INTO produto (nome, codigo, preco_venda, custo, categoria, quantidade_estoque, icms, ipi, pis, cofins, ncm, cfop, cst) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(conn -> {
+            PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"id"});
+            stmt.setString(1, produto.getNome());
+            stmt.setString(2, produto.getCodigo());
+            stmt.setDouble(3, produto.getPrecoVenda());
+            stmt.setDouble(4, produto.getCusto());
+            stmt.setString(5, produto.getCategoria());
+            stmt.setInt(6, produto.getQuantidadeEstoque());
+            stmt.setDouble(7, produto.getIcms());
+            stmt.setDouble(8, produto.getIpi());
+            stmt.setDouble(9, produto.getPis());
+            stmt.setDouble(10, produto.getCofins());
+            stmt.setString(11, produto.getNcm());
+            stmt.setString(12, produto.getCfop());
+            stmt.setString(13, produto.getCst());
+            return stmt;
+        }, keyHolder);
+        produto.setId(keyHolder.getKey().intValue());
+    }
+
+    public void atualizar(Produto produto) {
+        // Coluna 'ativo' adicionada no UPDATE!
+        String sql = "UPDATE produto SET nome=?, codigo=?, preco_venda=?, custo=?, categoria=?, quantidade_estoque=?, icms=?, ipi=?, pis=?, cofins=?, ncm=?, cfop=?, cst=?, ativo=? WHERE id=?";
+        jdbcTemplate.update(sql,
+                produto.getNome(), produto.getCodigo(), produto.getPrecoVenda(), produto.getCusto(),
+                produto.getCategoria(), produto.getQuantidadeEstoque(), produto.getIcms(), produto.getIpi(),
+                produto.getPis(), produto.getCofins(), produto.getNcm(), produto.getCfop(), produto.getCst(),
+                produto.isAtivo(), produto.getId());
+    }
+
+    public void deletar(int id) {
+        // Soft delete no produto!
+        jdbcTemplate.update("UPDATE produto SET ativo = false WHERE id=?", id);
+    }
+
+    public Optional<Produto> buscarPorId(int id) {
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE id=? AND ativo = true";
+        return jdbcTemplate.query(sql, MAPPER, id).stream().findFirst();
+    }
+
+    public List<Produto> listarTodos() {
+        // Filtro ativo = true
+        return jdbcTemplate.query("SELECT * FROM produto WHERE ativo = true ORDER BY nome", MAPPER);
+    }
+
+    public List<Produto> buscarPorNome(String nome) {
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE nome ILIKE ? AND ativo = true ORDER BY nome";
+        return jdbcTemplate.query(sql, MAPPER, "%" + nome + "%");
+    }
+
+    public Optional<Produto> buscarPorCodigo(String codigo) {
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE codigo=? AND ativo = true";
+        return jdbcTemplate.query(sql, MAPPER, codigo).stream().findFirst();
+    }
+
+    public List<Produto> listarEstoqueBaixo(int limite) {
+        // Filtro ativo = true
+        String sql = "SELECT * FROM produto WHERE quantidade_estoque <= ? AND ativo = true ORDER BY quantidade_estoque ASC";
+        return jdbcTemplate.query(sql, MAPPER, limite);
     }
 }

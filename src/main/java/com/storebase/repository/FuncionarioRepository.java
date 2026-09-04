@@ -1,110 +1,24 @@
 package com.storebase.repository;
 
-import com.storebase.config.AppConfig;
 import com.storebase.model.Funcionario;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class FuncionarioRepository {
 
-    public void salvar(Funcionario funcionario) {
-        String sql = "INSERT INTO usuario (nome, cargo, login, senha, salario) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, funcionario.getNome());
-            stmt.setString(2, funcionario.getCargo());
-            stmt.setString(3, funcionario.getLogin());
-            stmt.setString(4, funcionario.getSenha());
-            stmt.setDouble(5, funcionario.getSalario());
-            stmt.executeUpdate();
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) funcionario.setId(rs.getInt(1));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao salvar funcionario: " + e.getMessage());
-        }
-    }
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    public void atualizar(Funcionario funcionario) {
-        // SQL ajustado para incluir o 'ativo'
-        String sql = "UPDATE usuario SET nome=?, cargo=?, login=?, senha=?, salario=?, ativo=? WHERE id=?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, funcionario.getNome());
-            stmt.setString(2, funcionario.getCargo());
-            stmt.setString(3, funcionario.getLogin());
-            stmt.setString(4, funcionario.getSenha());
-            stmt.setDouble(5, funcionario.getSalario());
-            stmt.setBoolean(6, funcionario.isAtivo()); // Posição 6: status ativo
-            stmt.setInt(7, funcionario.getId());       // Posição 7: id para o WHERE
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar funcionario: " + e.getMessage());
-        }
-    }
-
-    public void deletar(int id) {
-        // Soft Delete: em vez de DELETE, fazemos um UPDATE mudando para false
-        String sql = "UPDATE usuario SET ativo = false WHERE id=?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Erro ao desativar funcionario: " + e.getMessage());
-        }
-    }
-
-    public Optional<Funcionario> buscarPorId(int id) {
-        // Filtrando para trazer apenas usuários ativos
-        String sql = "SELECT * FROM usuario WHERE id=? AND ativo = true";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return Optional.of(mapear(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar funcionario por id: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
-
-    public List<Funcionario> listarTodos() {
-        List<Funcionario> lista = new ArrayList<>();
-        // Filtrando ativos antes de fazer o ORDER BY
-        String sql = "SELECT * FROM usuario WHERE ativo = true ORDER BY nome";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) lista.add(mapear(rs));
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar funcionarios: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    public Optional<Funcionario> buscarPorLogin(String login) {
-        // Importante garantir que um funcionário inativo não consiga fazer login
-        String sql = "SELECT * FROM usuario WHERE login=? AND ativo = true";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, login);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return Optional.of(mapear(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar funcionario por login: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
-
-    private Funcionario mapear(ResultSet rs) throws SQLException {
+    private static final RowMapper<Funcionario> MAPPER = (rs, rowNum) -> {
         Funcionario f = new Funcionario();
         f.setId(rs.getInt("id"));
         f.setNome(rs.getString("nome"));
@@ -114,5 +28,51 @@ public class FuncionarioRepository {
         f.setSalario(rs.getDouble("salario"));
         f.setAtivo(rs.getBoolean("ativo")); // Lendo o dado do banco e setando no objeto
         return f;
+    };
+
+    public void salvar(Funcionario funcionario) {
+        String sql = "INSERT INTO usuario (nome, cargo, login, senha, salario) VALUES (?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(conn -> {
+            PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"id"});
+            stmt.setString(1, funcionario.getNome());
+            stmt.setString(2, funcionario.getCargo());
+            stmt.setString(3, funcionario.getLogin());
+            stmt.setString(4, funcionario.getSenha());
+            stmt.setDouble(5, funcionario.getSalario());
+            return stmt;
+        }, keyHolder);
+        funcionario.setId(keyHolder.getKey().intValue());
+    }
+
+    public void atualizar(Funcionario funcionario) {
+        // SQL ajustado para incluir o 'ativo'
+        String sql = "UPDATE usuario SET nome=?, cargo=?, login=?, senha=?, salario=?, ativo=? WHERE id=?";
+        jdbcTemplate.update(sql,
+                funcionario.getNome(), funcionario.getCargo(), funcionario.getLogin(),
+                funcionario.getSenha(), funcionario.getSalario(), funcionario.isAtivo(),
+                funcionario.getId());
+    }
+
+    public void deletar(int id) {
+        // Soft Delete: em vez de DELETE, fazemos um UPDATE mudando para false
+        jdbcTemplate.update("UPDATE usuario SET ativo = false WHERE id=?", id);
+    }
+
+    public Optional<Funcionario> buscarPorId(int id) {
+        // Filtrando para trazer apenas usuários ativos
+        String sql = "SELECT * FROM usuario WHERE id=? AND ativo = true";
+        return jdbcTemplate.query(sql, MAPPER, id).stream().findFirst();
+    }
+
+    public List<Funcionario> listarTodos() {
+        // Filtrando ativos antes de fazer o ORDER BY
+        return jdbcTemplate.query("SELECT * FROM usuario WHERE ativo = true ORDER BY nome", MAPPER);
+    }
+
+    public Optional<Funcionario> buscarPorLogin(String login) {
+        // Importante garantir que um funcionário inativo não consiga fazer login
+        String sql = "SELECT * FROM usuario WHERE login=? AND ativo = true";
+        return jdbcTemplate.query(sql, MAPPER, login).stream().findFirst();
     }
 }
