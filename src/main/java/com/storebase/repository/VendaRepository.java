@@ -1,172 +1,29 @@
 package com.storebase.repository;
 
-import com.storebase.config.AppConfig;
 import com.storebase.model.Cliente;
 import com.storebase.model.Funcionario;
 import com.storebase.model.ItemVenda;
 import com.storebase.model.Produto;
 import com.storebase.model.Venda;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class VendaRepository {
 
-    public void salvar(Venda venda) {
-        Connection conn = AppConfig.getConnection();
-        try {
-            conn.setAutoCommit(false);
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-            String sqlPedido = "INSERT INTO pedido (valor_total, desconto, forma_pagamento, status, cliente_id, usuario_id, parcelas, taxa_juros, observacoes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setDouble(1, venda.getValorTotal());
-                stmt.setDouble(2, venda.getDesconto());
-                stmt.setString(3, venda.getFormaPagamento());
-                stmt.setString(4, venda.getStatus());
-                if (venda.getCliente() != null) {
-                    stmt.setInt(5, venda.getCliente().getId());
-                } else {
-                    stmt.setNull(5, java.sql.Types.INTEGER);
-                }
-                stmt.setInt(6, venda.getFuncionario().getId());
-                stmt.setInt(7, venda.getParcelas());
-                stmt.setDouble(8, venda.getTaxaJuros());
-                stmt.setString(9, venda.getObservacoes());
-                stmt.executeUpdate();
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) venda.setId(rs.getInt(1));
-                }
-            }
-
-            String sqlItem = "INSERT INTO item_pedido (pedido_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)";
-            for (ItemVenda item : venda.getItens()) {
-                try (PreparedStatement stmt = conn.prepareStatement(sqlItem)) {
-                    stmt.setInt(1, venda.getId());
-                    stmt.setInt(2, item.getProduto().getId());
-                    stmt.setInt(3, item.getQuantidade());
-                    stmt.setDouble(4, item.getSubtotal() / item.getQuantidade());
-                    stmt.executeUpdate();
-                }
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            try { conn.rollback(); } catch (SQLException ex) { System.err.println(ex.getMessage()); }
-            System.err.println("Erro ao salvar venda: " + e.getMessage());
-        } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException e) { System.err.println(e.getMessage()); }
-        }
-    }
-
-    public Optional<Venda> buscarPorId(int id) {
-        String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, v.parcelas, v.taxa_juros, v.observacoes, " +
-                "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
-                "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
-                "FROM pedido v " +
-                "LEFT JOIN cliente c ON v.cliente_id = c.id " +
-                "JOIN usuario u ON v.usuario_id = u.id " +
-                "WHERE v.id = ?";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Venda v = mapear(rs);
-                    // Agora repassamos a mesma conexão 'conn' para não fechá-la acidentalmente!
-                    v.setItens(carregarItens(v.getId(), conn));
-                    return Optional.of(v);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar venda por id: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
-
-    public List<Venda> listarTodas() {
-        List<Venda> lista = new ArrayList<>();
-        String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, v.parcelas, v.taxa_juros, v.observacoes, " +
-                "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
-                "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
-                "FROM pedido v " +
-                "LEFT JOIN cliente c ON v.cliente_id = c.id " +
-                "JOIN usuario u ON v.usuario_id = u.id " +
-                "ORDER BY v.data DESC";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Venda v = mapear(rs);
-                // Repassando a conexão principal aqui também
-                v.setItens(carregarItens(v.getId(), conn));
-                lista.add(v);
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar vendas: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    public List<Venda> listarPorCliente(int clienteId) {
-        List<Venda> lista = new ArrayList<>();
-        String sql = "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, v.parcelas, v.taxa_juros, v.observacoes, " +
-                "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
-                "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
-                "FROM pedido v " +
-                "JOIN cliente c ON v.cliente_id = c.id " +
-                "JOIN usuario u ON v.usuario_id = u.id " +
-                "WHERE v.cliente_id = ? ORDER BY v.data DESC";
-        try (Connection conn = AppConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, clienteId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Venda v = mapear(rs);
-                    // E repassando a conexão aqui também
-                    v.setItens(carregarItens(v.getId(), conn));
-                    lista.add(v);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar vendas por cliente: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    // Método refatorado para receber a Connection externa!
-    private List<ItemVenda> carregarItens(int vendaId, Connection conn) {
-        List<ItemVenda> itens = new ArrayList<>();
-        String sql = "SELECT i.quantidade, i.preco_unitario, " +
-                "p.id AS p_id, p.nome AS p_nome, p.codigo, p.preco_venda, p.custo, p.quantidade_estoque " +
-                "FROM item_pedido i JOIN produto p ON i.produto_id = p.id " +
-                "WHERE i.pedido_id = ?";
-        // Removemos o "Connection conn = ..." daqui do bloco try para usar a que foi passada por parâmetro
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, vendaId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Produto p = new Produto();
-                    p.setId(rs.getInt("p_id"));
-                    p.setNome(rs.getString("p_nome"));
-                    p.setCodigo(rs.getString("codigo"));
-                    p.setPrecoVenda(rs.getDouble("preco_venda"));
-                    p.setCusto(rs.getDouble("custo"));
-                    p.setQuantidadeEstoque(rs.getInt("quantidade_estoque"));
-                    ItemVenda item = new ItemVenda(p, rs.getInt("quantidade"));
-                    itens.add(item);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao carregar itens da venda: " + e.getMessage());
-        }
-        return itens;
-    }
-
-    private Venda mapear(ResultSet rs) throws SQLException {
+    private static final RowMapper<Venda> MAPPER = (rs, rowNum) -> {
         Venda v = new Venda();
         v.setId(rs.getInt("id"));
         v.setValorTotal(rs.getDouble("valor_total"));
@@ -194,5 +51,97 @@ public class VendaRepository {
         f.setLogin(rs.getString("u_login"));
         v.setFuncionario(f);
         return v;
+    };
+
+    private static final RowMapper<ItemVenda> ITEM_MAPPER = (rs, rowNum) -> {
+        Produto p = new Produto();
+        p.setId(rs.getInt("p_id"));
+        p.setNome(rs.getString("p_nome"));
+        p.setCodigo(rs.getString("codigo"));
+        p.setPrecoVenda(rs.getDouble("preco_venda"));
+        p.setCusto(rs.getDouble("custo"));
+        p.setQuantidadeEstoque(rs.getInt("quantidade_estoque"));
+        return new ItemVenda(p, rs.getInt("quantidade"));
+    };
+
+    private static final String SELECT_BASE =
+            "SELECT v.id, v.valor_total, v.desconto, v.forma_pagamento, v.status, v.data, v.parcelas, v.taxa_juros, v.observacoes, " +
+            "c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.email AS c_email, c.endereco AS c_endereco, " +
+            "u.id AS u_id, u.nome AS u_nome, u.cargo AS u_cargo, u.login AS u_login " +
+            "FROM pedido v ";
+
+    /**
+     * Insere apenas a linha de pedido e devolve o id gerado. A transacao que
+     * amarra pedido + itens fica em VendaService.registrarVenda (@Transactional).
+     */
+    public int inserirPedido(Venda venda) {
+        String sql = "INSERT INTO pedido (valor_total, desconto, forma_pagamento, status, cliente_id, usuario_id, parcelas, taxa_juros, observacoes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(conn -> {
+            PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"id"});
+            stmt.setDouble(1, venda.getValorTotal());
+            stmt.setDouble(2, venda.getDesconto());
+            stmt.setString(3, venda.getFormaPagamento());
+            stmt.setString(4, venda.getStatus());
+            if (venda.getCliente() != null) {
+                stmt.setInt(5, venda.getCliente().getId());
+            } else {
+                stmt.setNull(5, Types.INTEGER);
+            }
+            stmt.setInt(6, venda.getFuncionario().getId());
+            stmt.setInt(7, venda.getParcelas());
+            stmt.setDouble(8, venda.getTaxaJuros());
+            stmt.setString(9, venda.getObservacoes());
+            return stmt;
+        }, keyHolder);
+        return keyHolder.getKey().intValue();
+    }
+
+    public void inserirItem(int vendaId, ItemVenda item) {
+        String sql = "INSERT INTO item_pedido (pedido_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, vendaId, item.getProduto().getId(), item.getQuantidade(),
+                item.getSubtotal() / item.getQuantidade());
+    }
+
+    public Optional<Venda> buscarPorId(int id) {
+        String sql = SELECT_BASE +
+                "LEFT JOIN cliente c ON v.cliente_id = c.id " +
+                "JOIN usuario u ON v.usuario_id = u.id " +
+                "WHERE v.id = ?";
+        Optional<Venda> venda = jdbcTemplate.query(sql, MAPPER, id).stream().findFirst();
+        venda.ifPresent(v -> v.setItens(carregarItens(v.getId())));
+        return venda;
+    }
+
+    public List<Venda> listarTodas() {
+        String sql = SELECT_BASE +
+                "LEFT JOIN cliente c ON v.cliente_id = c.id " +
+                "JOIN usuario u ON v.usuario_id = u.id " +
+                "ORDER BY v.data DESC";
+        List<Venda> lista = jdbcTemplate.query(sql, MAPPER);
+        for (Venda v : lista) {
+            v.setItens(carregarItens(v.getId()));
+        }
+        return lista;
+    }
+
+    public List<Venda> listarPorCliente(int clienteId) {
+        String sql = SELECT_BASE +
+                "JOIN cliente c ON v.cliente_id = c.id " +
+                "JOIN usuario u ON v.usuario_id = u.id " +
+                "WHERE v.cliente_id = ? ORDER BY v.data DESC";
+        List<Venda> lista = jdbcTemplate.query(sql, MAPPER, clienteId);
+        for (Venda v : lista) {
+            v.setItens(carregarItens(v.getId()));
+        }
+        return lista;
+    }
+
+    private List<ItemVenda> carregarItens(int vendaId) {
+        String sql = "SELECT i.quantidade, i.preco_unitario, " +
+                "p.id AS p_id, p.nome AS p_nome, p.codigo, p.preco_venda, p.custo, p.quantidade_estoque " +
+                "FROM item_pedido i JOIN produto p ON i.produto_id = p.id " +
+                "WHERE i.pedido_id = ?";
+        return jdbcTemplate.query(sql, ITEM_MAPPER, vendaId);
     }
 }

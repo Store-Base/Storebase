@@ -10,6 +10,7 @@ import com.storebase.model.Venda;
 import com.storebase.repository.OrcamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,18 +26,30 @@ public class OrcamentoService {
     @Autowired
     private VendaService vendaService;
 
+    @Transactional
     public void criar(Orcamento orcamento) {
-        orcamentoRepository.cadastrar(orcamento);
+        int id = orcamentoRepository.inserirOrcamento(orcamento);
+        orcamento.setId(id);
+        for (ItemOrcamento item : orcamento.getItens()) {
+            orcamentoRepository.inserirItem(id, item);
+        }
     }
 
+    @Transactional
     public void atualizar(Orcamento orcamento) {
         buscarPorId(orcamento.getId());
-        orcamentoRepository.atualizar(orcamento);
+        orcamentoRepository.atualizarOrcamento(orcamento);
+        orcamentoRepository.removerItens(orcamento.getId());
+        for (ItemOrcamento item : orcamento.getItens()) {
+            orcamentoRepository.inserirItem(orcamento.getId(), item);
+        }
     }
 
+    @Transactional
     public void deletar(int id) {
         buscarPorId(id);
-        orcamentoRepository.deletar(id);
+        orcamentoRepository.removerItens(id);
+        orcamentoRepository.removerOrcamento(id);
     }
 
     public Orcamento buscarPorId(int id) {
