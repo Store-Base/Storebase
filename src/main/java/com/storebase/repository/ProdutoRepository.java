@@ -71,6 +71,11 @@ public class ProdutoRepository {
                 produto.isAtivo(), produto.getId());
     }
 
+    public int baixarEstoque(int produtoId, int quantidade) {
+        String sql = "UPDATE produto SET quantidade_estoque = quantidade_estoque - ? WHERE id = ? AND quantidade_estoque >= ?";
+        return jdbcTemplate.update(sql, quantidade, produtoId, quantidade);
+    }
+
     public void deletar(int id) {
         // Soft delete no produto!
         jdbcTemplate.update("UPDATE produto SET ativo = false WHERE id=?", id);
